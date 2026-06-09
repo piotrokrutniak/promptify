@@ -43,5 +43,5 @@ public class RequestLoggerTests
         _identityService.Verify(i => i.GetUserNameAsync(It.IsAny<string>()), Times.Never);
     }
 
-    private sealed record TestRequest : IRequest;
+    public sealed class TestRequest : IRequest;
 }

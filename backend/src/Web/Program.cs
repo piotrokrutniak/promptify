@@ -1,4 +1,5 @@
 using PromptifyWebApi.Infrastructure.Data;
+using PromptifyWebApi.Infrastructure.Messaging;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,7 @@ builder.AddKeyVaultIfConfigured();
 builder.AddApplicationServices();
 builder.AddInfrastructureServices();
 builder.AddWebServices();
+builder.AddPromptifyMessaging(_ => { });
 
 var app = builder.Build();
 

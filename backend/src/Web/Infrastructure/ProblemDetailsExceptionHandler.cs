@@ -6,7 +6,7 @@ namespace PromptifyWebApi.Web.Infrastructure;
 
 /// <summary>
 /// Converts well-known application exceptions into RFC 9110-compliant <see cref="ProblemDetails"/> responses,
-/// mapping <see cref="ValidationException"/> → 400, <see cref="NotFoundException"/> → 404,
+/// mapping <see cref="ValidationException"/> → 400, <see cref="EntityNotFoundException"/> → 404,
 /// <see cref="UnauthorizedAccessException"/> → 401, and <see cref="ForbiddenAccessException"/> → 403.
 /// Unrecognised exceptions are not handled and fall through to the default middleware.
 /// </summary>
@@ -21,12 +21,19 @@ public class ProblemDetailsExceptionHandler : IExceptionHandler
                 Status = StatusCodes.Status400BadRequest,
                 Type = "https://tools.ietf.org/html/rfc9110#section-15.5.1"
             }),
-            NotFoundException ne => (StatusCodes.Status404NotFound, new ProblemDetails
+            EntityNotFoundException ne => (StatusCodes.Status404NotFound, new ProblemDetails
             {
                 Status = StatusCodes.Status404NotFound,
                 Type = "https://tools.ietf.org/html/rfc9110#section-15.5.5",
                 Title = "The specified resource was not found.",
                 Detail = ne.Message
+            }),
+            ConflictException ce => (StatusCodes.Status409Conflict, new ProblemDetails
+            {
+                Status = StatusCodes.Status409Conflict,
+                Title = "Conflict",
+                Type = "https://tools.ietf.org/html/rfc9110#section-15.5.10",
+                Detail = ce.Message
             }),
             UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, new ProblemDetails
             {
