@@ -7,12 +7,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace PromptifyWebApi.Application.FunctionalTests.Infrastructure;
 
-public class WebApiFactory(string connectionString) : WebApplicationFactory<Program>
+public class WebApiFactory(string connectionString, string messagingConnectionString) : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder
-            .UseSetting("ConnectionStrings:PromptifyWebApiDb", connectionString);
+            .UseSetting("ConnectionStrings:PromptifyWebApiDb", connectionString)
+            .UseSetting("ConnectionStrings:messaging", messagingConnectionString)
+            .UseSetting("Llm:MockDelayMs", "0");
 
         builder.ConfigureTestServices(services =>
         {

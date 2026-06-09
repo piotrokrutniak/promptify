@@ -1,5 +1,7 @@
 using PromptifyWebApi.Infrastructure.Data;
 using PromptifyWebApi.Infrastructure.Messaging;
+using PromptifyWebApi.Web.Consumers;
+using PromptifyWebApi.Web.Hubs;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,7 +13,8 @@ builder.AddKeyVaultIfConfigured();
 builder.AddApplicationServices();
 builder.AddInfrastructureServices();
 builder.AddWebServices();
-builder.AddPromptifyMessaging(_ => { });
+builder.AddPromptifyMessaging(x => x.AddConsumer<PromptStatusChangedConsumer>());
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -46,6 +49,6 @@ app.Map("/", () => Results.Redirect("/scalar"));
 
 app.MapDefaultEndpoints();
 app.MapEndpoints(typeof(Program).Assembly);
-
+app.MapHub<PromptStatusHub>("/hubs/prompts");
 
 app.Run();

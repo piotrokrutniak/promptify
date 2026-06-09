@@ -9,21 +9,17 @@
 | 04 | [App development](04-app-development.md) | done |
 | 05 | [Frontend](05-frontend.md) | deferred |
 | 06 | [Orchestration](06-orchestration.md) | done |
-| 07 | [API–Worker integration](07-api-worker-integration.md) | design |
+| 07 | [API–Worker integration](07-api-worker-integration.md) | done |
 
 ## Architecture
 
 ```
-┌─────────────┐     REST      ┌──────────┐
-│  Frontend   │ ────────────► │  Web API │
-│  (deferred) │ ◄── SignalR ──│  + Hub   │
-└─────────────┘               └────┬─────┘
-                                   │
-                              ┌────▼─────┐
-                              │ Postgres │
-                              └────┬─────┘
-                                   │
-                              ┌────▼─────┐
-                              │  Worker  │──► Mock LLM
-                              └──────────┘
+┌─────────────┐     REST      ┌──────────┐     RabbitMQ     ┌──────────┐
+│  Frontend   │ ────────────► │  Web API │ ◄──────────────► │  Worker  │
+│  (deferred) │ ◄── SignalR ──│  + Hub   │                  │ consumer │
+└─────────────┘               └────┬─────┘                  └────┬─────┘
+                                   │                              │
+                              ┌────▼─────┐                  ┌─────▼────┐
+                              │ Postgres │                  │ Mock LLM │
+                              └──────────┘                  └──────────┘
 ```

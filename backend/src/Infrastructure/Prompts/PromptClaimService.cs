@@ -22,40 +22,29 @@ public class PromptClaimService
         _logger = logger;
     }
 
-    public async Task<Prompt?> TryClaimNextAsync(CancellationToken cancellationToken)
+    public async Task<Prompt?> ClaimPromptByIdAsync(int promptId, CancellationToken cancellationToken)
     {
         await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
 
         var pending = nameof(PromptStatus.Pending);
-        var processing = nameof(PromptStatus.Processing);
-        var now = _timeProvider.GetUtcNow();
-
-        var promptId = await _context.Database
+        var claimedId = await _context.Database
             .SqlQuery<int?>($"""
                 SELECT p."Id" AS "Value"
                 FROM "Prompts" AS p
-                WHERE p."Status" = {pending}
-                  AND NOT EXISTS (
-                    SELECT 1
-                    FROM "Prompts" AS earlier
-                    WHERE earlier."SessionId" = p."SessionId"
-                      AND earlier."OrderIndex" < p."OrderIndex"
-                      AND earlier."Status" IN ({pending}, {processing})
-                  )
-                ORDER BY p."Created"
-                LIMIT 1
+                WHERE p."Id" = {promptId}
+                  AND p."Status" = {pending}
                 FOR UPDATE OF p SKIP LOCKED
                 """)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (promptId is null)
+        if (claimedId is null)
         {
             await transaction.RollbackAsync(cancellationToken);
             return null;
         }
 
         var prompt = await _context.Prompts
-            .FirstOrDefaultAsync(p => p.Id == promptId, cancellationToken);
+            .FirstOrDefaultAsync(p => p.Id == claimedId, cancellationToken);
 
         if (prompt is null)
         {
@@ -63,6 +52,7 @@ public class PromptClaimService
             return null;
         }
 
+        var now = _timeProvider.GetUtcNow();
         prompt.Status = PromptStatus.Processing;
         prompt.ProcessingStartedAt = now;
         prompt.LastModified = now;

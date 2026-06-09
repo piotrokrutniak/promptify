@@ -14,7 +14,7 @@ public class FunctionalTestSetup
     [OneTimeSetUp]
     public async Task OneTimeSetUp()
     {
-        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
         var cancellationToken = cts.Token;
 
         var builder = await DistributedApplicationTestingBuilder
@@ -38,9 +38,13 @@ public class FunctionalTestSetup
         await _app.ResourceNotifications.WaitForResourceHealthyAsync(
             Services.Database, cancellationToken);
 
-        var connectionString = (await _app.GetConnectionStringAsync(Services.Database))!;
+        await _app.ResourceNotifications.WaitForResourceHealthyAsync(
+            Services.Messaging, cancellationToken);
 
-        _factory = new WebApiFactory(connectionString);
+        var connectionString = (await _app.GetConnectionStringAsync(Services.Database))!;
+        var messagingConnectionString = (await _app.GetConnectionStringAsync(Services.Messaging))!;
+
+        _factory = new WebApiFactory(connectionString, messagingConnectionString);
         ScopeFactory = _factory.Services.GetRequiredService<IServiceScopeFactory>();
         DbResetter = await DatabaseResetter.CreateAsync(connectionString);
     }

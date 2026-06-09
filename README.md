@@ -2,14 +2,14 @@
 
 Interview assignment: submit prompts, track processing status, view results.
 
-**Stack:** .NET 10 Clean Architecture backend, PostgreSQL, separate Worker process, SignalR.
+**Stack:** .NET 10 Clean Architecture backend, PostgreSQL, RabbitMQ + MassTransit, separate Worker process, SignalR.
 
 ## Quick start (local dev)
 
 Requires [.NET 10 SDK](https://dotnet.microsoft.com/download).
 
 ```bash
-make apphost    # Aspire: Postgres + Web API + Worker
+make apphost    # Aspire: Postgres + RabbitMQ + Web API + Worker
 make test       # run tests
 ```
 
