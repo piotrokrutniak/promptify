@@ -1,0 +1,28 @@
+# .NET
+**/bin/
+**/obj/
+**/artifacts/
+*.user
+*.suo
+.vs/
+
+# Node (future frontend)
+node_modules/
+.next/
+out/
+
+# Secrets
+**/appsettings.local.json
+.env
+.env.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+
+# Docker
+pgdata/
