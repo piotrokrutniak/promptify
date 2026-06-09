@@ -1,4 +1,15 @@
 services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
   db:
     image: postgres:16
     environment:
@@ -21,8 +32,11 @@ services:
       - "8080:8080"
     environment:
       ASPNETCORE_ENVIRONMENT: Docker
+      ConnectionStrings__messaging: amqp://guest:guest@rabbitmq:5672
     depends_on:
       db:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   worker:
@@ -31,8 +45,11 @@ services:
       dockerfile: Dockerfile.worker
     environment:
       DOTNET_ENVIRONMENT: Docker
+      ConnectionStrings__messaging: amqp://guest:guest@rabbitmq:5672
     depends_on:
       db:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
       webapi:
         condition: service_started

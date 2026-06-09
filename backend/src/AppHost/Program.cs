@@ -11,9 +11,14 @@ var databaseServer = builder
         container.WithLifetime(ContainerLifetime.Persistent))
     .AddDatabase(Services.Database);
 
+var messaging = builder.AddRabbitMQ(Services.Messaging)
+    .WithManagementPlugin();
+
 var web = builder.AddProject<Projects.Web>(Services.WebApi)
     .WithReference(databaseServer)
+    .WithReference(messaging)
     .WaitFor(databaseServer)
+    .WaitFor(messaging)
     .WithExternalHttpEndpoints()
     .WithAspNetCoreEnvironment()
     .WithUrlForEndpoint("http", url =>
@@ -24,6 +29,8 @@ var web = builder.AddProject<Projects.Web>(Services.WebApi)
 
 builder.AddProject<Projects.Worker>(Services.Worker)
     .WithReference(databaseServer)
-    .WaitFor(databaseServer);
+    .WithReference(messaging)
+    .WaitFor(databaseServer)
+    .WaitFor(messaging);
 
 builder.Build().Run();
