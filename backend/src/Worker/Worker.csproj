@@ -3,6 +3,7 @@
   <PropertyGroup>
     <RootNamespace>PromptifyWebApi.Worker</RootNamespace>
     <AssemblyName>PromptifyWebApi.Worker</AssemblyName>
+    <UserSecretsId>promptify-worker</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

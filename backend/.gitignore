@@ -490,3 +490,5 @@ $RECYCLE.BIN/
 *.db
 *.db-shm
 *.db-wal
+
+/src/Worker/appsettings.json

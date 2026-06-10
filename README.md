@@ -44,6 +44,8 @@ ollama pull llama3.2
 dotnet user-secrets set "Llm:Provider" "Ollama" --project backend/src/Worker
 ```
 
+User secrets load when the Worker runs in Development (`make apphost` or `dotnet run --project backend/src/Worker`). Docker uses `Llm__*` env vars instead, configured from `appsettings.json`.
+
 **Docker** — set worker env vars, e.g. `Llm__Provider=OpenAI` and `Llm__OpenAiApiKey=sk-...` (use a `.env` file; do not commit secrets).
 
 See [docs/07-api-worker-integration.md](docs/07-api-worker-integration.md) for the full config table.

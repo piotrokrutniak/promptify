@@ -5,8 +5,11 @@ internal static class AspireExtensions
     {
         builder.WithEnvironment(context =>
         {
-            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            context.EnvironmentVariables["ASPNETCORE_ENVIRONMENT"] = environment ?? "Development";
+            var environment = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+                ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+                ?? "Development";
+            context.EnvironmentVariables["DOTNET_ENVIRONMENT"] = environment;
+            context.EnvironmentVariables["ASPNETCORE_ENVIRONMENT"] = environment;
         });
 
         return builder;

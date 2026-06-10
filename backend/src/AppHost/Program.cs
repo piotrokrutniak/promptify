@@ -31,6 +31,7 @@ builder.AddProject<Projects.Worker>(Services.Worker)
     .WithReference(databaseServer)
     .WithReference(messaging)
     .WaitFor(databaseServer)
-    .WaitFor(messaging);
+    .WaitFor(messaging)
+    .WithAspNetCoreEnvironment();
 
 builder.Build().Run();

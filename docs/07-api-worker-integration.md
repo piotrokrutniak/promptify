@@ -159,7 +159,15 @@ Provider is selected via `Llm:Provider`:
 | `OpenAI` | `OpenAiLlmClient` | Official OpenAI SDK; requires `Llm:OpenAiApiKey` |
 | `Ollama` | `OllamaLlmClient` | Named `IHttpClientFactory` client (`ollama`); `CreateClient` per `CompleteAsync` call |
 
-Configuration (`Worker/appsettings.json` + env overrides):
+Configuration (`Worker/appsettings.json`, user secrets in local dev, env overrides in Docker/production):
+
+Local dev secrets (Worker only, Development environment):
+
+```bash
+dotnet user-secrets set "Llm:Provider" "OpenAI" --project backend/src/Worker
+dotnet user-secrets list --project backend/src/Worker
+```
+
 
 | Key | Default | Purpose |
 |-----|---------|---------|
