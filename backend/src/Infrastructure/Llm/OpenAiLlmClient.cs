@@ -46,7 +46,28 @@ public class OpenAiLlmClient : ILlmClient
             chatMessages,
             cancellationToken: cancellationToken);
 
-        return completion.Content[0].Text ?? string.Empty;
+        return ExtractAssistantText(completion);
+    }
+
+    internal static string ExtractAssistantText(ChatCompletion completion)
+    {
+        return ExtractAssistantText(completion.Content);
+    }
+
+    internal static string ExtractAssistantText(IReadOnlyList<ChatMessageContentPart> content)
+    {
+        if (content is not { Count: > 0 })
+        {
+            throw new InvalidOperationException("OpenAI returned an empty response.");
+        }
+
+        var text = content[0].Text;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            throw new InvalidOperationException("OpenAI returned an empty response.");
+        }
+
+        return text;
     }
 
     private static ChatMessage MapMessage(LlmMessage message)
