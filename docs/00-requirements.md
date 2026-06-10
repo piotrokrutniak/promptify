@@ -35,9 +35,9 @@ Build a simple full-stack system for submitting multiple LLM prompts and trackin
 | Polling or real-time refresh | 04 (SignalR) | done |
 | One-command orchestration | 06 | done |
 | Run instructions | README + 06 | done |
+| Real LLM provider (OpenAI / Ollama / Mock) | 04 | done |
 
 ## Out of scope (for now)
 
 - GitHub access for reviewers
-- Real LLM provider (mock only; config hook for later)
 - Frontend implementation

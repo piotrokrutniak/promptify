@@ -28,7 +28,7 @@ flowchart LR
     end
     subgraph workerProcess [Worker]
         Processor[ProcessPromptConsumer]
-        LLM[ILlmClient_Mock]
+        LLM[ILlmClient]
     end
     DB[(PostgreSQL)]
 
@@ -146,6 +146,33 @@ Connection string key: `ConnectionStrings:messaging` (`Services.Messaging` const
 | Tests | `make test` |
 
 Aspire AppHost adds RabbitMQ with management plugin and wires `ConnectionStrings__messaging` into Web and Worker automatically.
+
+## LLM integration
+
+`ProcessPromptConsumer` builds multi-turn chat history from prior **Completed** prompts in the same session, then calls `ILlmClient.CompleteAsync(messages)`.
+
+Provider is selected via `Llm:Provider`:
+
+| Provider | Implementation | Notes |
+|----------|----------------|-------|
+| `Mock` | `MockLlmClient` | Default; echoes last user message with configurable delay |
+| `OpenAI` | `OpenAiLlmClient` | Official OpenAI SDK; requires `Llm:OpenAiApiKey` |
+| `Ollama` | `OllamaLlmClient` | Local HTTP API at `Llm:OllamaBaseUrl` |
+
+Configuration (`Worker/appsettings.json` + env overrides):
+
+| Key | Default | Purpose |
+|-----|---------|---------|
+| `Llm:Provider` | `Mock` | Provider switch |
+| `Llm:MockDelayMs` | `2000` | Mock latency (ms) |
+| `Llm:OpenAiApiKey` | — | OpenAI API key (secret) |
+| `Llm:OpenAiModel` | `gpt-4o-mini` | OpenAI model |
+| `Llm:OpenAiBaseUrl` | — | Optional endpoint override (Azure OpenAI) |
+| `Llm:OllamaBaseUrl` | `http://localhost:11434` | Ollama host |
+| `Llm:OllamaModel` | `llama3.2` | Ollama model |
+| `Llm:TimeoutSeconds` | `120` | HTTP timeout for Ollama |
+
+Worker fails at startup when `Provider=OpenAI` and the API key is missing.
 
 ## Reliability
 

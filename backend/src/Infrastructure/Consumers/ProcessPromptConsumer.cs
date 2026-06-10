@@ -2,6 +2,7 @@ using MassTransit;
 using PromptifyWebApi.Application.Common.Interfaces;
 using PromptifyWebApi.Domain.Enums;
 using PromptifyWebApi.Infrastructure.Data;
+using PromptifyWebApi.Infrastructure.Llm;
 using PromptifyWebApi.Infrastructure.Prompts;
 using PromptifyWebApi.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,7 @@ public class ProcessPromptConsumer : IConsumer<ProcessPromptCommand>
 {
     private readonly ApplicationDbContext _context;
     private readonly PromptClaimService _claimService;
+    private readonly ConversationHistoryBuilder _historyBuilder;
     private readonly ILlmClient _llmClient;
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly TimeProvider _timeProvider;
@@ -21,6 +23,7 @@ public class ProcessPromptConsumer : IConsumer<ProcessPromptCommand>
     public ProcessPromptConsumer(
         ApplicationDbContext context,
         PromptClaimService claimService,
+        ConversationHistoryBuilder historyBuilder,
         ILlmClient llmClient,
         IPublishEndpoint publishEndpoint,
         TimeProvider timeProvider,
@@ -28,6 +31,7 @@ public class ProcessPromptConsumer : IConsumer<ProcessPromptCommand>
     {
         _context = context;
         _claimService = claimService;
+        _historyBuilder = historyBuilder;
         _llmClient = llmClient;
         _publishEndpoint = publishEndpoint;
         _timeProvider = timeProvider;
@@ -74,7 +78,13 @@ public class ProcessPromptConsumer : IConsumer<ProcessPromptCommand>
 
         try
         {
-            var output = await _llmClient.CompleteAsync(prompt.Input, cancellationToken);
+            var messages = await _historyBuilder.BuildAsync(
+                prompt.SessionId,
+                prompt.OrderIndex,
+                prompt.Input,
+                cancellationToken);
+
+            var output = await _llmClient.CompleteAsync(messages, cancellationToken);
 
             if (await IsCancelledAsync(prompt.Id, cancellationToken))
             {

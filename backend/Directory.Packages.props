@@ -41,6 +41,8 @@
     <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.2.0" />
     <PackageVersion Include="MassTransit" Version="8.5.5" />
     <PackageVersion Include="MassTransit.RabbitMQ" Version="8.5.5" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.5" />
+    <PackageVersion Include="OpenAI" Version="2.1.0" />
     <PackageVersion Include="Aspire.Hosting.Azure.AppContainers" Version="13.2.0" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="13.2.0" />
     <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.2.0" />

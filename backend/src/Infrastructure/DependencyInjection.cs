@@ -69,8 +69,7 @@ public static class DependencyInjection
         builder.Services.AddSingleton(TimeProvider.System);
         builder.Services.AddTransient<IIdentityService, IdentityService>();
 
-        builder.Services.Configure<LlmOptions>(builder.Configuration.GetSection(LlmOptions.SectionName));
-        builder.Services.AddSingleton<ILlmClient, MockLlmClient>();
+        builder.Services.AddLlmClient(builder.Configuration);
         builder.Services.AddScoped<PromptClaimService>();
     }
 }

@@ -2,10 +2,11 @@ using MassTransit;
 using PromptifyWebApi.Application.Common.Interfaces;
 using PromptifyWebApi.Domain.Entities;
 using PromptifyWebApi.Domain.Enums;
+using PromptifyWebApi.Infrastructure.Consumers;
 using PromptifyWebApi.Infrastructure.Data;
+using PromptifyWebApi.Infrastructure.Llm;
 using PromptifyWebApi.Infrastructure.Prompts;
 using PromptifyWebApi.Shared.Messaging;
-using PromptifyWebApi.Infrastructure.Consumers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -56,20 +57,21 @@ public class ProcessPromptConsumerTests
     }
 
     private static async Task<(ProcessPromptConsumer Consumer, Mock<IPublishEndpoint> PublishEndpoint, ApplicationDbContext Context)> CreateConsumerAsync(
-        Prompt prompt)
+        params Prompt[] prompts)
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .Options;
 
         var context = new ApplicationDbContext(options);
-        context.Prompts.Add(prompt);
+        context.Prompts.AddRange(prompts);
         await context.SaveChangesAsync(CancellationToken.None);
 
         var publishEndpoint = new Mock<IPublishEndpoint>();
         var consumer = new ProcessPromptConsumer(
             context,
             new PromptClaimService(context, TimeProvider.System, Mock.Of<ILogger<PromptClaimService>>()),
+            new ConversationHistoryBuilder(context),
             Mock.Of<ILlmClient>(),
             publishEndpoint.Object,
             TimeProvider.System,
