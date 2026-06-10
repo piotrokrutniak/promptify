@@ -6,7 +6,7 @@ import {
   type InfoResponse,
 } from "@/generated/api"
 import { createAuthenticatedUsersApi } from "@/lib/api-client"
-import { clearAuthCookies, getAccessToken } from "@/lib/auth/cookies"
+import { getAccessToken } from "@/lib/auth/cookies"
 
 export type AuthSession = {
   accessToken: string
@@ -29,13 +29,11 @@ export async function requireAuth(): Promise<AuthSession> {
       error instanceof ResponseError &&
       (error.response.status === 401 || error.response.status === 403)
     ) {
-      await clearAuthCookies()
-      redirect("/sign-in")
+      redirect("/api/auth/sign-out")
     }
 
     if (error instanceof FetchError) {
-      await clearAuthCookies()
-      redirect("/sign-in")
+      redirect("/api/auth/sign-out")
     }
 
     throw error

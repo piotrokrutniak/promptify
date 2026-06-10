@@ -42,6 +42,11 @@ export async function getAccessToken(): Promise<string | undefined> {
   return cookieStore.get(ACCESS_TOKEN_COOKIE)?.value
 }
 
+export async function getRefreshToken(): Promise<string | undefined> {
+  const cookieStore = await cookies()
+  return cookieStore.get(REFRESH_TOKEN_COOKIE)?.value
+}
+
 export async function clearAuthCookies() {
   const cookieStore = await cookies()
   cookieStore.delete(ACCESS_TOKEN_COOKIE)

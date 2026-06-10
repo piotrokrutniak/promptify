@@ -2,6 +2,10 @@ export async function fetchAccessToken(): Promise<string> {
   const response = await fetch("/api/auth/token", { credentials: "include" })
 
   if (!response.ok) {
+    if (typeof window !== "undefined") {
+      window.location.assign("/api/auth/sign-out")
+    }
+
     throw new Error("Not authenticated")
   }
 
