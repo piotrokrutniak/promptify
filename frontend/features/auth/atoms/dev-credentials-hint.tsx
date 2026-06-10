@@ -5,7 +5,7 @@ export function DevCredentialsHint() {
 
   return (
     <p className="font-mono text-xs text-muted-foreground">
-      Dev credentials: administrator@localhost / Administrator1!
+      Dev credentials: administrator@localhost.com / Administrator1!
     </p>
   )
 }
