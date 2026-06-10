@@ -39,10 +39,13 @@ if (!app.Environment.IsEnvironment("Docker"))
 {
     app.UseHttpsRedirection();
 }
-app.UseCors(static builder => 
-    builder.AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowAnyOrigin());
+var corsOrigins = app.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? ["http://localhost:3000"];
+app.UseCors(policy => policy
+    .WithOrigins(corsOrigins)
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials());
 
 app.UseAuthentication();
 app.UseAuthorization();

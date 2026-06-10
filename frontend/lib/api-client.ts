@@ -8,9 +8,9 @@ export function getApiBaseUrl() {
   return process.env.API_BASE_URL ?? DEFAULT_BASE_URL
 }
 
-/** Same-origin path; Next.js rewrites to API_BASE_URL (see next.config.ts). */
+/** Browser connects directly; API CORS must allow the frontend origin. */
 export function getPromptStatusHubUrl() {
-  return "/hubs/prompts"
+  return `${getApiBaseUrl().replace(/\/+$/, "")}/hubs/prompts`
 }
 
 function createConfiguration(accessToken?: string) {

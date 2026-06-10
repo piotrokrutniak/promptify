@@ -9,7 +9,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import type { SignalRConnectionStatus } from "@/hooks/use-prompt-status-hub"
+import { useDeferredOpen } from "@/hooks/use-deferred-open"
+import type { SignalRConnectionStatus } from "@/lib/signalr/types"
+
+const CONNECTING_DIALOG_DELAY_MS = 400
 
 type SignalRConnectionDialogProps = {
   status: SignalRConnectionStatus
@@ -45,10 +48,11 @@ function getDescription(status: SignalRConnectionStatus): string {
       return [
         hubLine,
         status.error,
+        status.debugDetails,
         "Live prompt status updates are unavailable.",
       ]
         .filter(Boolean)
-        .join("\n")
+        .join("\n\n")
     default:
       return hubLine ?? ""
   }
@@ -58,10 +62,13 @@ export function SignalRConnectionDialog({
   status,
   onRetry,
 }: SignalRConnectionDialogProps) {
-  const open =
+  const shouldOpen =
     status.state === "connecting" ||
     status.state === "reconnecting" ||
     status.state === "disconnected"
+  const openDelayMs =
+    status.state === "disconnected" ? 0 : CONNECTING_DIALOG_DELAY_MS
+  const open = useDeferredOpen(shouldOpen, openDelayMs)
 
   return (
     <Dialog open={open}>

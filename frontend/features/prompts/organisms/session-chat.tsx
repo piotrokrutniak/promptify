@@ -123,24 +123,24 @@ export function SessionChat(props: SessionChatProps) {
         />
       ) : null}
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <ChatMessageList prompts={prompts} />
-      {error ? (
-        <div className="shrink-0 px-4 pb-2">
-          <FormErrorAlert message={error} />
-        </div>
-      ) : null}
-      <ChatComposer
-        onSubmit={handleSubmit}
-        onStop={
-          pendingPromptId !== undefined
-            ? () => handleCancel(pendingPromptId)
-            : undefined
-        }
-        canStop={pendingPromptId !== undefined}
-        inputDisabled={!isIdle}
-        isLoading={isLoading}
-        isStopping={isStopping}
-      />
+        <ChatMessageList prompts={prompts} />
+        {error ? (
+          <div className="shrink-0 px-4 pb-2">
+            <FormErrorAlert message={error} />
+          </div>
+        ) : null}
+        <ChatComposer
+          onSubmit={handleSubmit}
+          onStop={
+            pendingPromptId !== undefined
+              ? () => handleCancel(pendingPromptId)
+              : undefined
+          }
+          canStop={pendingPromptId !== undefined}
+          inputDisabled={!isIdle}
+          isLoading={isLoading}
+          isStopping={isStopping}
+        />
       </div>
     </>
   )
