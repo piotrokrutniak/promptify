@@ -25,6 +25,10 @@ Next.js UI for submitting prompts and viewing statuses/results. Not implemented 
 - Phase 04 complete (API + SignalR working)
 - OpenAPI spec available at `/openapi/v1.json`
 
+## Agent workflow
+
+When phase 05 starts, follow [frontend/AGENTS.md](../frontend/AGENTS.md) for the backend-first → regenerate OpenAPI → implement UI workflow.
+
 ## No tasks yet
 
 Do not create `frontend/` until this phase is explicitly started.
