@@ -13,7 +13,7 @@ import { ChatMessageList } from "@/features/prompts/molecules/chat-message-list"
 import { SignalRConnectionDialog } from "@/features/prompts/molecules/signalr-connection-dialog"
 import { usePromptStatusHub } from "@/hooks/use-prompt-status-hub"
 import {
-  getPendingPromptId,
+  getInFlightPromptId,
   isSessionIdle,
 } from "@/lib/prompts/session-idle"
 import { applyPromptStatusChanged } from "@/lib/signalr/prompt-status-changed"
@@ -54,10 +54,10 @@ export function SessionChat(props: SessionChatProps) {
   })
 
   const isIdle = isSessionIdle(prompts)
-  const pendingPromptId = getPendingPromptId(prompts)
+  const inFlightPromptId = getInFlightPromptId(prompts)
   const isLoading = isPending
   const isStopping =
-    pendingPromptId !== undefined && cancellingPromptId === pendingPromptId
+    inFlightPromptId !== undefined && cancellingPromptId === inFlightPromptId
 
   function handleSubmit(input: string) {
     setError(undefined)
@@ -130,11 +130,11 @@ export function SessionChat(props: SessionChatProps) {
         <ChatComposer
           onSubmit={handleSubmit}
           onStop={
-            pendingPromptId !== undefined
-              ? () => handleCancel(pendingPromptId)
+            inFlightPromptId !== undefined
+              ? () => handleCancel(inFlightPromptId)
               : undefined
           }
-          canStop={pendingPromptId !== undefined}
+          canStop={inFlightPromptId !== undefined}
           inputDisabled={!isIdle}
           isLoading={isLoading}
           isStopping={isStopping}

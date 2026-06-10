@@ -43,9 +43,9 @@ public class CancelPromptCommandHandler : IRequestHandler<CancelPromptCommand>
             throw new ForbiddenAccessException();
         }
 
-        if (prompt.Status != PromptStatus.Pending)
+        if (prompt.Status is not (PromptStatus.Pending or PromptStatus.Processing))
         {
-            throw new ConflictException("Only pending prompts can be cancelled.");
+            throw new ConflictException("Only in-flight prompts can be cancelled.");
         }
 
         prompt.Status = PromptStatus.Cancelled;

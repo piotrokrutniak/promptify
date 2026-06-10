@@ -1,5 +1,4 @@
 using MassTransit;
-using PromptifyWebApi.Application.Common.Exceptions;
 using PromptifyWebApi.Application.Common.Interfaces;
 using PromptifyWebApi.Application.Prompts.Commands.CancelPrompt;
 using PromptifyWebApi.Domain.Entities;
@@ -59,7 +58,7 @@ public class CancelPromptTests
     }
 
     [Test]
-    public async Task Handle_WhenPromptIsProcessing_ShouldThrowConflictException()
+    public async Task Handle_WhenPromptIsProcessing_ShouldCancelAndPublishStatusChanged()
     {
         var options = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -82,13 +81,22 @@ public class CancelPromptTests
         var user = new Mock<IUser>();
         user.Setup(u => u.Id).Returns(userId);
 
-        var handler = new CancelPromptCommandHandler(
-            context,
-            user.Object,
-            Mock.Of<IPublishEndpoint>());
+        PromptStatusChanged? published = null;
+        var publishEndpoint = new Mock<IPublishEndpoint>();
+        publishEndpoint
+            .Setup(p => p.Publish(It.IsAny<PromptStatusChanged>(), It.IsAny<CancellationToken>()))
+            .Callback<PromptStatusChanged, CancellationToken>((message, _) => published = message)
+            .Returns(Task.CompletedTask);
 
-        var act = () => handler.Handle(new CancelPromptCommand(prompt.Id), CancellationToken.None);
+        var handler = new CancelPromptCommandHandler(context, user.Object, publishEndpoint.Object);
 
-        await act.ShouldThrowAsync<ConflictException>();
+        await handler.Handle(new CancelPromptCommand(prompt.Id), CancellationToken.None);
+
+        var updated = await context.Prompts.AsNoTracking().SingleAsync();
+        updated.Status.ShouldBe(PromptStatus.Cancelled);
+
+        published.ShouldNotBeNull();
+        published!.PromptId.ShouldBe(prompt.Id);
+        published.Status.ShouldBe(nameof(PromptStatus.Cancelled));
     }
 }

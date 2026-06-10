@@ -28,7 +28,7 @@ export async function cancelPromptAction(
   } catch (error) {
     if (error instanceof ResponseError) {
       if (error.response.status === 409) {
-        return { ok: false, error: "Only pending prompts can be cancelled" }
+        return { ok: false, error: "This prompt can no longer be cancelled" }
       }
 
       if (error.response.status === 404) {

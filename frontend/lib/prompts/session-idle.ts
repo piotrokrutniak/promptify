@@ -9,10 +9,10 @@ export function isSessionIdle(prompts: PromptDto[]): boolean {
   )
 }
 
-export function getPendingPromptId(prompts: PromptDto[]): number | undefined {
+export function getInFlightPromptId(prompts: PromptDto[]): number | undefined {
   for (let i = prompts.length - 1; i >= 0; i--) {
     const prompt = prompts[i]
-    if ((prompt.status ?? "") !== "Pending") {
+    if (!IN_FLIGHT_STATUSES.has(prompt.status ?? "")) {
       continue
     }
 
@@ -24,3 +24,4 @@ export function getPendingPromptId(prompts: PromptDto[]): number | undefined {
 
   return undefined
 }
+
