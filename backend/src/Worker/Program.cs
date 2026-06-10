@@ -6,6 +6,7 @@ using PromptifyWebApi.Infrastructure.Messaging;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddSingleton<IUser, SystemUser>();
+builder.AddApplicationServices();
 builder.AddInfrastructureServices();
 builder.AddPromptifyMessaging(x => x.AddConsumer<ProcessPromptConsumer>());
 
