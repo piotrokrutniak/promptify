@@ -4,6 +4,7 @@ using PromptifyWebApi.Infrastructure.Data.Interceptors;
 using PromptifyWebApi.Infrastructure.Identity;
 using PromptifyWebApi.Infrastructure.Llm;
 using PromptifyWebApi.Infrastructure.Prompts;
+using Microsoft.AspNetCore.Authentication.BearerToken;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -37,6 +38,25 @@ public static class DependencyInjection
 
         builder.Services.AddAuthentication()
             .AddBearerToken(IdentityConstants.BearerScheme);
+
+        builder.Services.Configure<BearerTokenOptions>(IdentityConstants.BearerScheme, options =>
+        {
+            options.Events = new BearerTokenEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var accessToken = context.Request.Query["access_token"];
+                    var path = context.HttpContext.Request.Path;
+                    if (!string.IsNullOrEmpty(accessToken) &&
+                        path.StartsWithSegments("/hubs/prompts"))
+                    {
+                        context.Token = accessToken;
+                    }
+
+                    return Task.CompletedTask;
+                }
+            };
+        });
 
         builder.Services.AddAuthorizationBuilder();
 
