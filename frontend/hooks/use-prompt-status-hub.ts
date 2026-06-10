@@ -8,11 +8,16 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react"
 
 import { fetchAccessToken } from "@/lib/auth/fetch-access-token"
+import { redirectToSignOut } from "@/lib/auth/redirect-sign-out"
 import {
   formatConnectionDiagnostics,
   logConnectionDiagnostics,
   probeHubNegotiate,
 } from "@/lib/signalr/diagnose-hub-connection"
+import {
+  shouldSignOutOnHubFailure,
+  SIGNALR_DISCONNECTED_PUBLIC_MESSAGE,
+} from "@/lib/signalr/connection-messages"
 import type { PromptStatusChangedMessage } from "@/lib/signalr/prompt-status-changed"
 import type { SignalRConnectionStatus } from "@/lib/signalr/types"
 
@@ -27,18 +32,6 @@ type UsePromptStatusHubOptions = {
 
 /** Serializes hub start/stop across Strict Mode remounts and Fast Refresh. */
 let connectionGate: Promise<void> = Promise.resolve()
-
-function getErrorMessage(error: unknown): string | undefined {
-  if (error instanceof Error) {
-    return error.message
-  }
-
-  if (typeof error === "string") {
-    return error
-  }
-
-  return undefined
-}
 
 async function reportConnectionFailure(
   hubUrl: string,
@@ -66,17 +59,12 @@ async function reportConnectionFailure(
 
   logConnectionDiagnostics(debugDetails)
 
-  const probeSummary = negotiateProbe.ok
-    ? `negotiate probe: HTTP ${negotiateProbe.status} OK (${negotiateProbe.elapsedMs}ms)`
-    : negotiateProbe.fetchError
-      ? `negotiate probe: ${negotiateProbe.fetchError.name ?? "Error"} — ${negotiateProbe.fetchError.message ?? "fetch failed"} (${negotiateProbe.elapsedMs}ms)`
-      : `negotiate probe: HTTP ${negotiateProbe.status ?? "?"} ${negotiateProbe.statusText ?? ""} (${negotiateProbe.elapsedMs}ms)`
-
-  const hint = negotiateProbe.hint ?? ""
-  const connectionMessage = getErrorMessage(connectionError) ?? "Unknown error"
+  if (shouldSignOutOnHubFailure(connectionError, negotiateProbe)) {
+    redirectToSignOut()
+  }
 
   return {
-    error: [connectionMessage, probeSummary, hint].filter(Boolean).join("\n"),
+    error: SIGNALR_DISCONNECTED_PUBLIC_MESSAGE,
     debugDetails,
   }
 }

@@ -10,17 +10,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useDeferredOpen } from "@/hooks/use-deferred-open"
+import { SIGNALR_DISCONNECTED_PUBLIC_MESSAGE } from "@/lib/signalr/connection-messages"
 import type { SignalRConnectionStatus } from "@/lib/signalr/types"
 
 const CONNECTING_DIALOG_DELAY_MS = 400
+const isDev = process.env.NODE_ENV === "development"
 
 type SignalRConnectionDialogProps = {
   status: SignalRConnectionStatus
   onRetry: () => void
 }
 
-function getTitle(status: SignalRConnectionStatus["state"]): string {
-  switch (status) {
+function getTitle(state: SignalRConnectionStatus["state"]): string {
+  switch (state) {
     case "connecting":
       return "Connecting to live updates"
     case "reconnecting":
@@ -33,11 +35,15 @@ function getTitle(status: SignalRConnectionStatus["state"]): string {
 }
 
 function getDescription(status: SignalRConnectionStatus): string {
-  const hubLine = status.hubUrl ? `Hub: ${status.hubUrl}` : undefined
+  const hubLine =
+    isDev && status.hubUrl ? `Hub: ${status.hubUrl}` : undefined
 
   switch (status.state) {
     case "connecting":
-      return [hubLine, "Establishing a SignalR connection for prompt status updates."]
+      return [
+        hubLine,
+        "Establishing a connection for prompt status updates.",
+      ]
         .filter(Boolean)
         .join("\n")
     case "reconnecting":
@@ -45,14 +51,17 @@ function getDescription(status: SignalRConnectionStatus): string {
         .filter(Boolean)
         .join("\n")
     case "disconnected":
-      return [
-        hubLine,
-        status.error,
-        status.debugDetails,
-        "Live prompt status updates are unavailable.",
-      ]
-        .filter(Boolean)
-        .join("\n\n")
+      if (isDev) {
+        return [
+          hubLine,
+          status.error ?? SIGNALR_DISCONNECTED_PUBLIC_MESSAGE,
+          status.debugDetails,
+        ]
+          .filter(Boolean)
+          .join("\n\n")
+      }
+
+      return status.error ?? SIGNALR_DISCONNECTED_PUBLIC_MESSAGE
     default:
       return hubLine ?? ""
   }
