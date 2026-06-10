@@ -20,7 +20,7 @@ public static class LlmServiceCollectionExtensions
                 "Llm:OpenAiApiKey is required when Llm:Provider is OpenAI.")
             .ValidateOnStart();
 
-        services.AddHttpClient<OllamaLlmClient>((serviceProvider, client) =>
+        services.AddHttpClient(OllamaLlmClient.HttpClientName, (serviceProvider, client) =>
         {
             var options = serviceProvider.GetRequiredService<IOptions<LlmOptions>>().Value;
             client.BaseAddress = new Uri(options.OllamaBaseUrl.TrimEnd('/') + "/");
@@ -29,6 +29,7 @@ public static class LlmServiceCollectionExtensions
 
         services.AddSingleton<MockLlmClient>();
         services.AddSingleton<OpenAiLlmClient>();
+        services.AddSingleton<OllamaLlmClient>();
         services.AddSingleton<ILlmClient>(serviceProvider =>
         {
             var provider = serviceProvider.GetRequiredService<IOptions<LlmOptions>>().Value.Provider;

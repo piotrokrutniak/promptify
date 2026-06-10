@@ -157,7 +157,7 @@ Provider is selected via `Llm:Provider`:
 |----------|----------------|-------|
 | `Mock` | `MockLlmClient` | Default; echoes last user message with configurable delay |
 | `OpenAI` | `OpenAiLlmClient` | Official OpenAI SDK; requires `Llm:OpenAiApiKey` |
-| `Ollama` | `OllamaLlmClient` | Local HTTP API at `Llm:OllamaBaseUrl` |
+| `Ollama` | `OllamaLlmClient` | Named `IHttpClientFactory` client (`ollama`); `CreateClient` per `CompleteAsync` call |
 
 Configuration (`Worker/appsettings.json` + env overrides):
 

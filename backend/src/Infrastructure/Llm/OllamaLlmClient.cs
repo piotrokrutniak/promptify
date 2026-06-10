@@ -8,12 +8,14 @@ namespace PromptifyWebApi.Infrastructure.Llm;
 
 public class OllamaLlmClient : ILlmClient
 {
-    private readonly HttpClient _httpClient;
+    public const string HttpClientName = "ollama";
+
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly LlmOptions _options;
 
-    public OllamaLlmClient(HttpClient httpClient, IOptions<LlmOptions> options)
+    public OllamaLlmClient(IHttpClientFactory httpClientFactory, IOptions<LlmOptions> options)
     {
-        _httpClient = httpClient;
+        _httpClientFactory = httpClientFactory;
         _options = options.Value;
     }
 
@@ -21,12 +23,14 @@ public class OllamaLlmClient : ILlmClient
         IReadOnlyList<LlmMessage> messages,
         CancellationToken cancellationToken)
     {
+        var httpClient = _httpClientFactory.CreateClient(HttpClientName);
+
         var request = new OllamaChatRequest(
             _options.OllamaModel,
             messages.Select(MapMessage).ToList(),
             Stream: false);
 
-        using var response = await _httpClient.PostAsJsonAsync(
+        using var response = await httpClient.PostAsJsonAsync(
             "api/chat",
             request,
             cancellationToken);

@@ -32,8 +32,11 @@ public class OllamaLlmClientTests
                 };
             });
 
+        var httpClientFactory = new StubHttpClientFactory(
+            new HttpClient(handler) { BaseAddress = new Uri("http://localhost:11434/") });
+
         var client = new OllamaLlmClient(
-            new HttpClient(handler) { BaseAddress = new Uri("http://localhost:11434/") },
+            httpClientFactory,
             Options.Create(new LlmOptions
             {
                 OllamaModel = "llama3.2",
@@ -45,6 +48,59 @@ public class OllamaLlmClientTests
 
         result.ShouldBe("hello from ollama");
         handler.RequestCount.ShouldBe(1);
+        httpClientFactory.CreateClientCallCount.ShouldBe(1);
+    }
+
+    [Test]
+    public async Task CompleteAsync_OnEachCall_ShouldCreateClientFromFactory()
+    {
+        var httpClientFactory = new StubHttpClientFactory(
+            new HttpClient(new StubHttpMessageHandler(_ => new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(
+                    """
+                    {
+                      "message": {
+                        "role": "assistant",
+                        "content": "ok"
+                      }
+                    }
+                    """),
+            }))
+            {
+                BaseAddress = new Uri("http://localhost:11434/"),
+            });
+
+        var client = new OllamaLlmClient(
+            httpClientFactory,
+            Options.Create(new LlmOptions { OllamaModel = "llama3.2" }));
+
+        await client.CompleteAsync([new LlmMessage(LlmRole.User, "one")], CancellationToken.None);
+        await client.CompleteAsync([new LlmMessage(LlmRole.User, "two")], CancellationToken.None);
+
+        httpClientFactory.CreateClientCallCount.ShouldBe(2);
+        httpClientFactory.LastClientName.ShouldBe(OllamaLlmClient.HttpClientName);
+    }
+
+    private sealed class StubHttpClientFactory : IHttpClientFactory
+    {
+        private readonly HttpClient _httpClient;
+
+        public StubHttpClientFactory(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
+        public int CreateClientCallCount { get; private set; }
+
+        public string? LastClientName { get; private set; }
+
+        public HttpClient CreateClient(string name)
+        {
+            CreateClientCallCount++;
+            LastClientName = name;
+            return _httpClient;
+        }
     }
 
     private sealed class StubHttpMessageHandler : HttpMessageHandler
