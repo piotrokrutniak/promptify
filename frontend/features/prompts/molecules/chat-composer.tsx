@@ -1,31 +1,41 @@
 "use client"
 
+import { SquareIcon } from "lucide-react"
 import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 
 type ChatComposerProps = {
   onSubmit: (input: string) => void | Promise<void>
-  disabled?: boolean
+  onStop?: () => void
+  canStop?: boolean
+  inputDisabled?: boolean
   isLoading?: boolean
+  isStopping?: boolean
 }
 
 export function ChatComposer({
   onSubmit,
-  disabled = false,
+  onStop,
+  canStop = false,
+  inputDisabled = false,
   isLoading = false,
+  isStopping = false,
 }: ChatComposerProps) {
   const [input, setInput] = useState("")
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (canStop) {
+      return
+    }
+
     const message = input.trim()
-    if (!message || disabled || isLoading) {
+    if (!message || inputDisabled || isLoading) {
       return
     }
 
     await onSubmit(message)
-    setInput("")
   }
 
   return (
@@ -38,13 +48,28 @@ export function ChatComposer({
         onChange={(event) => setInput(event.target.value)}
         placeholder="Write a prompt…"
         rows={3}
-        disabled={disabled || isLoading}
+        disabled={inputDisabled || isLoading || isStopping}
         className="w-full resize-none rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:opacity-50"
       />
       <div className="flex justify-end">
-        <Button type="submit" disabled={disabled || isLoading || !input.trim()}>
-          {isLoading ? "Sending…" : "Send"}
-        </Button>
+        {canStop ? (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onStop}
+            disabled={isStopping}
+          >
+            <SquareIcon className="fill-current" />
+            {isStopping ? "Stopping…" : "Stop"}
+          </Button>
+        ) : (
+          <Button
+            type="submit"
+            disabled={inputDisabled || isLoading || !input.trim()}
+          >
+            {isLoading ? "Sending…" : "Send"}
+          </Button>
+        )}
       </div>
     </form>
   )

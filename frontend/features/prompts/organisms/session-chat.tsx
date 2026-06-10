@@ -10,7 +10,10 @@ import { createPromptAction } from "@/features/prompts/actions/create-prompt"
 import { createSessionAction } from "@/features/prompts/actions/create-session"
 import { ChatComposer } from "@/features/prompts/molecules/chat-composer"
 import { ChatMessageList } from "@/features/prompts/molecules/chat-message-list"
-import { isSessionIdle } from "@/lib/prompts/session-idle"
+import {
+  getPendingPromptId,
+  isSessionIdle,
+} from "@/lib/prompts/session-idle"
 import { parseSessionId } from "@/lib/sessions/parse-id"
 
 export type SessionChatProps =
@@ -29,7 +32,10 @@ export function SessionChat(props: SessionChatProps) {
   )
 
   const isIdle = isSessionIdle(prompts)
+  const pendingPromptId = getPendingPromptId(prompts)
   const isLoading = isPending
+  const isStopping =
+    pendingPromptId !== undefined && cancellingPromptId === pendingPromptId
 
   function handleSubmit(input: string) {
     setError(undefined)
@@ -88,11 +94,7 @@ export function SessionChat(props: SessionChatProps) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <ChatMessageList
-        prompts={prompts}
-        onCancel={handleCancel}
-        cancellingPromptId={cancellingPromptId}
-      />
+      <ChatMessageList prompts={prompts} />
       {error ? (
         <div className="px-4 pb-2">
           <FormErrorAlert message={error} />
@@ -100,8 +102,15 @@ export function SessionChat(props: SessionChatProps) {
       ) : null}
       <ChatComposer
         onSubmit={handleSubmit}
-        disabled={!isIdle}
+        onStop={
+          pendingPromptId !== undefined
+            ? () => handleCancel(pendingPromptId)
+            : undefined
+        }
+        canStop={pendingPromptId !== undefined}
+        inputDisabled={!isIdle}
         isLoading={isLoading}
+        isStopping={isStopping}
       />
     </div>
   )
