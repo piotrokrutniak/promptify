@@ -1,9 +1,12 @@
 import { cookies } from "next/headers"
 
 import type { AccessTokenResponse } from "@/generated/api"
+import {
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+} from "@/lib/auth/constants"
 
-export const ACCESS_TOKEN_COOKIE = "promptify.access_token"
-export const REFRESH_TOKEN_COOKIE = "promptify.refresh_token"
+export { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE }
 
 const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 14 // 14 days
 
@@ -37,4 +40,10 @@ export async function setAuthCookies(tokens: AccessTokenResponse) {
 export async function getAccessToken(): Promise<string | undefined> {
   const cookieStore = await cookies()
   return cookieStore.get(ACCESS_TOKEN_COOKIE)?.value
+}
+
+export async function clearAuthCookies() {
+  const cookieStore = await cookies()
+  cookieStore.delete(ACCESS_TOKEN_COOKIE)
+  cookieStore.delete(REFRESH_TOKEN_COOKIE)
 }
