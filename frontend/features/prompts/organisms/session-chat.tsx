@@ -12,6 +12,7 @@ import { ChatComposer } from "@/features/prompts/molecules/chat-composer"
 import { ChatMessageList } from "@/features/prompts/molecules/chat-message-list"
 import { SignalRConnectionDialog } from "@/features/prompts/molecules/signalr-connection-dialog"
 import { usePromptStatusHub } from "@/hooks/use-prompt-status-hub"
+import { getChatDraftKey } from "@/lib/prompts/chat-draft-storage"
 import {
   getInFlightPromptId,
   isSessionIdle,
@@ -38,6 +39,14 @@ export function SessionChat(props: SessionChatProps) {
   const [prompts, setPrompts] = useState<PromptDto[]>(
     props.mode === "existing" ? props.initialPrompts : []
   )
+  const [restoreDraft, setRestoreDraft] = useState<
+    { text: string; at: number } | undefined
+  >()
+
+  const draftKey =
+    props.mode === "new"
+      ? getChatDraftKey("new")
+      : getChatDraftKey({ sessionId: props.sessionId })
 
   const handleStatusChanged = useCallback(
     (message: Parameters<typeof applyPromptStatusChanged>[1]) => {
@@ -93,6 +102,10 @@ export function SessionChat(props: SessionChatProps) {
     setError(undefined)
     setCancellingPromptId(promptId)
 
+    const textToRestore =
+      prompts.find((prompt) => parseSessionId(prompt.id) === promptId)?.input ??
+      ""
+
     startTransition(async () => {
       const result = await cancelPromptAction({ promptId })
       setCancellingPromptId(undefined)
@@ -109,6 +122,7 @@ export function SessionChat(props: SessionChatProps) {
             : prompt
         )
       )
+      setRestoreDraft({ text: textToRestore, at: Date.now() })
     })
   }
 
@@ -138,6 +152,8 @@ export function SessionChat(props: SessionChatProps) {
           inputDisabled={!isIdle}
           isLoading={isLoading}
           isStopping={isStopping}
+          draftKey={draftKey}
+          restoreDraft={restoreDraft}
         />
       </div>
     </>

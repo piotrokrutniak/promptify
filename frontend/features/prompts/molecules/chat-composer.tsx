@@ -1,9 +1,14 @@
 "use client"
 
 import { SquareIcon } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
+import {
+  clearChatDraft,
+  readChatDraft,
+  writeChatDraft,
+} from "@/lib/prompts/chat-draft-storage"
 
 type ChatComposerProps = {
   onSubmit: (input: string) => void | Promise<void>
@@ -12,6 +17,8 @@ type ChatComposerProps = {
   inputDisabled?: boolean
   isLoading?: boolean
   isStopping?: boolean
+  draftKey?: string
+  restoreDraft?: { text: string; at: number }
 }
 
 export function ChatComposer({
@@ -21,8 +28,27 @@ export function ChatComposer({
   inputDisabled = false,
   isLoading = false,
   isStopping = false,
+  draftKey,
+  restoreDraft,
 }: ChatComposerProps) {
   const [input, setInput] = useState("")
+
+  useEffect(() => {
+    if (!draftKey) {
+      return
+    }
+
+    setInput(readChatDraft(draftKey))
+  }, [draftKey])
+
+  useEffect(() => {
+    if (!restoreDraft || !draftKey) {
+      return
+    }
+
+    setInput(restoreDraft.text)
+    writeChatDraft(draftKey, restoreDraft.text)
+  }, [draftKey, restoreDraft?.at, restoreDraft?.text])
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -37,6 +63,15 @@ export function ChatComposer({
 
     await onSubmit(message)
     setInput("")
+    if (draftKey) {
+      clearChatDraft(draftKey)
+    }
+  }
+
+  function handleBlur() {
+    if (draftKey) {
+      writeChatDraft(draftKey, input)
+    }
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -62,6 +97,7 @@ export function ChatComposer({
       <textarea
         value={input}
         onChange={(event) => setInput(event.target.value)}
+        onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         placeholder="Write a prompt…"
         rows={3}
