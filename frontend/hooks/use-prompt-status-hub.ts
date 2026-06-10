@@ -5,9 +5,22 @@ import {
   HubConnectionBuilder,
   HubConnectionState,
 } from "@microsoft/signalr"
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import type { PromptStatusChangedMessage } from "@/lib/signalr/prompt-status-changed"
+
+export type SignalRConnectionState =
+  | "idle"
+  | "connecting"
+  | "connected"
+  | "reconnecting"
+  | "disconnected"
+
+export type SignalRConnectionStatus = {
+  state: SignalRConnectionState
+  error?: string
+  hubUrl?: string
+}
 
 type UsePromptStatusHubOptions = {
   hubUrl: string
@@ -15,6 +28,18 @@ type UsePromptStatusHubOptions = {
   sessionId: number
   onStatusChanged: (message: PromptStatusChangedMessage) => void
   enabled?: boolean
+}
+
+function getErrorMessage(error: unknown): string | undefined {
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  if (typeof error === "string") {
+    return error
+  }
+
+  return undefined
 }
 
 async function joinSession(
@@ -34,6 +59,21 @@ export function usePromptStatusHub({
   enabled = true,
 }: UsePromptStatusHubOptions) {
   const onStatusChangedRef = useRef(onStatusChanged)
+  const [retryToken, setRetryToken] = useState(0)
+  const [connectionStatus, setConnectionStatus] =
+    useState<SignalRConnectionStatus>({
+      state: "connecting",
+      hubUrl,
+    })
+
+  const retry = useCallback(() => {
+    setConnectionStatus({ state: "connecting", hubUrl })
+    setRetryToken((token) => token + 1)
+  }, [hubUrl])
+
+  const status: SignalRConnectionStatus = enabled
+    ? connectionStatus
+    : { state: "idle" }
 
   useEffect(() => {
     onStatusChangedRef.current = onStatusChanged
@@ -55,19 +95,54 @@ export function usePromptStatusHub({
       onStatusChangedRef.current(message)
     })
 
+    let cancelled = false
+
+    connection.onclose((error) => {
+      if (cancelled) {
+        return
+      }
+
+      setConnectionStatus({
+        state: "disconnected",
+        error: getErrorMessage(error),
+        hubUrl,
+      })
+    })
+
+    connection.onreconnecting(() => {
+      if (cancelled) {
+        return
+      }
+
+      setConnectionStatus({ state: "reconnecting", hubUrl })
+    })
+
     connection.onreconnected(async () => {
+      if (cancelled) {
+        return
+      }
+
       try {
         await joinSession(connection, sessionId)
+        setConnectionStatus({ state: "connected", hubUrl })
       } catch (error) {
+        if (!cancelled) {
+          setConnectionStatus({
+            state: "disconnected",
+            error: getErrorMessage(error),
+            hubUrl,
+          })
+        }
+
         if (process.env.NODE_ENV === "development") {
           console.error("[signalr] failed to rejoin session:", error)
         }
       }
     })
 
-    let cancelled = false
-
     void (async () => {
+      setConnectionStatus({ state: "connecting", hubUrl })
+
       try {
         if (process.env.NODE_ENV === "development") {
           console.log("[signalr] connecting to", hubUrl)
@@ -79,8 +154,21 @@ export function usePromptStatusHub({
         }
 
         await joinSession(connection, sessionId)
+        if (cancelled) {
+          return
+        }
+
+        setConnectionStatus({ state: "connected", hubUrl })
       } catch (error) {
-        if (process.env.NODE_ENV === "development") {
+        if (!cancelled) {
+          setConnectionStatus({
+            state: "disconnected",
+            error: getErrorMessage(error),
+            hubUrl,
+          })
+        }
+
+        if (process.env.NODE_ENV === "development" && !cancelled) {
           console.error("[signalr] connection failed:", error)
         }
       }
@@ -101,5 +189,7 @@ export function usePromptStatusHub({
         await connection.stop()
       })()
     }
-  }, [hubUrl, accessToken, sessionId, enabled])
+  }, [hubUrl, accessToken, sessionId, enabled, retryToken])
+
+  return { status, retry }
 }

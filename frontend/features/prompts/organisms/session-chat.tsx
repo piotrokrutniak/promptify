@@ -10,6 +10,7 @@ import { createPromptAction } from "@/features/prompts/actions/create-prompt"
 import { createSessionAction } from "@/features/prompts/actions/create-session"
 import { ChatComposer } from "@/features/prompts/molecules/chat-composer"
 import { ChatMessageList } from "@/features/prompts/molecules/chat-message-list"
+import { SignalRConnectionDialog } from "@/features/prompts/molecules/signalr-connection-dialog"
 import { usePromptStatusHub } from "@/hooks/use-prompt-status-hub"
 import {
   getPendingPromptId,
@@ -46,7 +47,7 @@ export function SessionChat(props: SessionChatProps) {
     []
   )
 
-  usePromptStatusHub({
+  const { status: signalRStatus, retry: retrySignalR } = usePromptStatusHub({
     hubUrl: props.mode === "existing" ? props.hubUrl : "",
     accessToken: props.mode === "existing" ? props.accessToken : "",
     sessionId: props.mode === "existing" ? props.sessionId : 0,
@@ -114,7 +115,14 @@ export function SessionChat(props: SessionChatProps) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <>
+      {props.mode === "existing" ? (
+        <SignalRConnectionDialog
+          status={signalRStatus}
+          onRetry={retrySignalR}
+        />
+      ) : null}
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <ChatMessageList prompts={prompts} />
       {error ? (
         <div className="shrink-0 px-4 pb-2">
@@ -133,6 +141,7 @@ export function SessionChat(props: SessionChatProps) {
         isLoading={isLoading}
         isStopping={isStopping}
       />
-    </div>
+      </div>
+    </>
   )
 }
