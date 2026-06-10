@@ -1,3 +1,10 @@
+<!-- BEGIN:nextjs-agent-rules -->
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+<!-- END:nextjs-agent-rules -->
+
+
 # Frontend agent guide
 
 **Status:** not yet scaffolded (phase 05 deferred). This file defines the workflow to follow when `frontend/` is created.
