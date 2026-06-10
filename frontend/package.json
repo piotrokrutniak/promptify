@@ -4,13 +4,13 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
-    "generate:api-spec": "node ./scripts/fetch-openapi.mjs && rm -rf generated/api && openapi-generator-cli generate --generator-key v1"
+    "generate:api-spec": "NODE_TLS_REJECT_UNAUTHORIZED=0 node ./scripts/fetch-openapi.mjs && rm -rf generated/api && openapi-generator-cli generate --generator-key v1"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

@@ -1,8 +1,5 @@
 .PHONY: apphost watch test docker-up docker-down docker-down-volumes generate-api
 
-generate-api:
-	cd frontend && npm run generate:api-spec
-
 apphost:
 	cd backend && dotnet run --project ./src/AppHost
 
@@ -20,3 +17,6 @@ docker-down:
 
 docker-down-volumes:
 	docker compose down -v
+
+generate-api:
+	cd frontend && npm run generate:api-spec
