@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using PromptifyWebApi.Application.Common.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -9,18 +10,25 @@ namespace PromptifyWebApi.Web.Hubs;
 public class PromptStatusHub : Hub
 {
     private readonly IApplicationDbContext _context;
-    private readonly IUser _user;
 
-    public PromptStatusHub(IApplicationDbContext context, IUser user)
+    public PromptStatusHub(IApplicationDbContext context)
     {
         _context = context;
-        _user = user;
     }
+
+    private string? GetUserId() =>
+        Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
     public async Task JoinSession(int sessionId)
     {
+        var userId = GetUserId();
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new HubException("Unauthorized.");
+        }
+
         var ownsSession = await _context.Sessions
-            .AnyAsync(s => s.Id == sessionId && s.UserId == _user.Id);
+            .AnyAsync(s => s.Id == sessionId && s.UserId == userId);
 
         if (!ownsSession)
         {
