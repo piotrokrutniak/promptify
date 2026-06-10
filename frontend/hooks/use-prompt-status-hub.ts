@@ -7,6 +7,7 @@ import {
 } from "@microsoft/signalr"
 import { useCallback, useEffect, useRef, useState } from "react"
 
+import { fetchAccessToken } from "@/lib/auth/fetch-access-token"
 import {
   formatConnectionDiagnostics,
   logConnectionDiagnostics,
@@ -19,11 +20,13 @@ export type { SignalRConnectionState, SignalRConnectionStatus } from "@/lib/sign
 
 type UsePromptStatusHubOptions = {
   hubUrl: string
-  accessToken: string
   sessionId: number
   onStatusChanged: (message: PromptStatusChangedMessage) => void
   enabled?: boolean
 }
+
+/** Serializes hub start/stop across Strict Mode remounts and Fast Refresh. */
+let connectionGate: Promise<void> = Promise.resolve()
 
 function getErrorMessage(error: unknown): string | undefined {
   if (error instanceof Error) {
@@ -39,10 +42,16 @@ function getErrorMessage(error: unknown): string | undefined {
 
 async function reportConnectionFailure(
   hubUrl: string,
-  accessToken: string,
   sessionId: number,
   connectionError: unknown
 ): Promise<Pick<SignalRConnectionStatus, "error" | "debugDetails">> {
+  let accessToken = ""
+  try {
+    accessToken = await fetchAccessToken()
+  } catch {
+    // Diagnostics still run with an empty token.
+  }
+
   const negotiateProbe = await probeHubNegotiate(hubUrl, accessToken)
   const debugDetails = formatConnectionDiagnostics({
     hubUrl,
@@ -74,7 +83,6 @@ async function reportConnectionFailure(
 
 export function usePromptStatusHub({
   hubUrl,
-  accessToken,
   sessionId,
   onStatusChanged,
   enabled = true,
@@ -106,10 +114,16 @@ export function usePromptStatusHub({
     }
 
     let cancelled = false
+    let releaseGate = () => {}
+
+    const priorGate = connectionGate
+    connectionGate = new Promise<void>((resolve) => {
+      releaseGate = resolve
+    })
 
     const connection = new HubConnectionBuilder()
       .withUrl(hubUrl, {
-        accessTokenFactory: () => accessToken,
+        accessTokenFactory: fetchAccessToken,
       })
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
@@ -136,12 +150,7 @@ export function usePromptStatusHub({
           return
         }
 
-        const failure = await reportConnectionFailure(
-          hubUrl,
-          accessToken,
-          sessionId,
-          error
-        )
+        const failure = await reportConnectionFailure(hubUrl, sessionId, error)
         setConnectionStatus({
           state: "disconnected",
           hubUrl,
@@ -156,12 +165,7 @@ export function usePromptStatusHub({
       }
 
       if (error) {
-        const failure = await reportConnectionFailure(
-          hubUrl,
-          accessToken,
-          sessionId,
-          error
-        )
+        const failure = await reportConnectionFailure(hubUrl, sessionId, error)
         setConnectionStatus({
           state: "disconnected",
           hubUrl,
@@ -177,6 +181,11 @@ export function usePromptStatusHub({
     })
 
     void (async () => {
+      await priorGate
+      if (cancelled) {
+        return
+      }
+
       setConnectionStatus({ state: "connecting", hubUrl, debugDetails: undefined })
 
       if (process.env.NODE_ENV === "development") {
@@ -184,7 +193,6 @@ export function usePromptStatusHub({
           hubUrl,
           sessionId,
           pageOrigin: window.location.origin,
-          accessTokenLength: accessToken.length,
         })
       }
 
@@ -211,12 +219,7 @@ export function usePromptStatusHub({
           return
         }
 
-        const failure = await reportConnectionFailure(
-          hubUrl,
-          accessToken,
-          sessionId,
-          error
-        )
+        const failure = await reportConnectionFailure(hubUrl, sessionId, error)
         setConnectionStatus({
           state: "disconnected",
           hubUrl,
@@ -228,15 +231,16 @@ export function usePromptStatusHub({
     return () => {
       cancelled = true
 
-      if (connection.state === HubConnectionState.Connected) {
-        void connection.invoke("LeaveSession", sessionId).finally(() => {
-          void connection.stop()
-        })
-      } else {
-        void connection.stop()
-      }
+      const stop =
+        connection.state === HubConnectionState.Connected
+          ? connection.invoke("LeaveSession", sessionId).finally(() => connection.stop())
+          : connection.stop()
+
+      void stop.finally(() => {
+        releaseGate()
+      })
     }
-  }, [hubUrl, accessToken, sessionId, enabled, retryToken])
+  }, [hubUrl, sessionId, enabled, retryToken])
 
   return { status, retry }
 }

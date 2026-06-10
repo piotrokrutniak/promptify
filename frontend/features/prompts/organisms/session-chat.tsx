@@ -25,7 +25,6 @@ export type SessionChatProps =
       mode: "existing"
       sessionId: number
       initialPrompts: PromptDto[]
-      accessToken: string
       hubUrl: string
     }
 
@@ -49,7 +48,6 @@ export function SessionChat(props: SessionChatProps) {
 
   const { status: signalRStatus, retry: retrySignalR } = usePromptStatusHub({
     hubUrl: props.mode === "existing" ? props.hubUrl : "",
-    accessToken: props.mode === "existing" ? props.accessToken : "",
     sessionId: props.mode === "existing" ? props.sessionId : 0,
     onStatusChanged: handleStatusChanged,
     enabled: props.mode === "existing",

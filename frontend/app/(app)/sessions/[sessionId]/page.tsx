@@ -35,17 +35,13 @@ export default async function SessionPage({ params }: SessionPageProps) {
     redirect("/sessions/new")
   }
 
-  const [{ accessToken }, session] = await Promise.all([
-    requireAuth(),
-    loadSession(sessionId),
-  ])
+  const [, session] = await Promise.all([requireAuth(), loadSession(sessionId)])
 
   return (
     <SessionChat
       mode="existing"
       sessionId={sessionId}
       initialPrompts={session.prompts ?? []}
-      accessToken={accessToken}
       hubUrl={getPromptStatusHubUrl()}
     />
   )
