@@ -104,7 +104,7 @@ export class SessionsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Creates a new session for the authenticated user and enqueues the first prompt for worker processing. Request body: input (required, max 8000 chars), title (optional, max 200 chars), data (optional context). Returns 201 Created with sessionId, title, and the initial prompt in Pending status. Location header points to /api/Sessions/{sessionId}.
+     * Creates a new session for the authenticated user and enqueues the first prompt for worker processing. Request body: input (required, max 8000 chars), data (optional context). Session title is derived from the first non-empty line of input (max 200 chars). Returns 201 Created with sessionId, title, and the initial prompt in Pending status. Location header points to /api/Sessions/{sessionId}.
      * Create session with first prompt
      */
     async createSessionRaw(requestParameters: CreateSessionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateSessionResponse>> {
@@ -133,7 +133,7 @@ export class SessionsApi extends runtime.BaseAPI {
     }
 
     /**
-     * Creates a new session for the authenticated user and enqueues the first prompt for worker processing. Request body: input (required, max 8000 chars), title (optional, max 200 chars), data (optional context). Returns 201 Created with sessionId, title, and the initial prompt in Pending status. Location header points to /api/Sessions/{sessionId}.
+     * Creates a new session for the authenticated user and enqueues the first prompt for worker processing. Request body: input (required, max 8000 chars), data (optional context). Session title is derived from the first non-empty line of input (max 200 chars). Returns 201 Created with sessionId, title, and the initial prompt in Pending status. Location header points to /api/Sessions/{sessionId}.
      * Create session with first prompt
      */
     async createSession(requestParameters: CreateSessionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateSessionResponse> {

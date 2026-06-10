@@ -1,4 +1,5 @@
 using MassTransit;
+using PromptifyWebApi.Application.Sessions;
 using PromptifyWebApi.Application.Common.Interfaces;
 using PromptifyWebApi.Application.Common.Models;
 using PromptifyWebApi.Application.Common.Security;
@@ -9,14 +10,13 @@ using PromptifyWebApi.Shared.Messaging;
 namespace PromptifyWebApi.Application.Sessions.Commands.CreateSession;
 
 [Authorize]
-public record CreateSessionCommand(string Input, string? Title, string? Data) : IRequest<CreateSessionResponse>;
+public record CreateSessionCommand(string Input, string? Data) : IRequest<CreateSessionResponse>;
 
 public class CreateSessionCommandValidator : AbstractValidator<CreateSessionCommand>
 {
     public CreateSessionCommandValidator()
     {
         RuleFor(v => v.Input).NotEmpty().MaximumLength(8000);
-        RuleFor(v => v.Title).MaximumLength(200);
     }
 }
 
@@ -43,7 +43,7 @@ public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand,
         var session = new Session
         {
             UserId = _user.Id,
-            Title = request.Title
+            Title = SessionTitleFromPrompt.Derive(request.Input)
         };
 
         var prompt = new Prompt

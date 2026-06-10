@@ -36,10 +36,11 @@ public class CreateSessionTests
         var handler = new CreateSessionCommandHandler(context, user.Object, publishEndpoint.Object);
 
         var result = await handler.Handle(
-            new CreateSessionCommand("Hello", "My session", null),
+            new CreateSessionCommand("Hello", null),
             CancellationToken.None);
 
         result.SessionId.ShouldBeGreaterThan(0);
+        result.Title.ShouldBe("Hello");
         result.Prompt.Id.ShouldBeGreaterThan(0);
         result.Prompt.Status.ShouldBe(nameof(PromptStatus.Pending));
         result.Prompt.Input.ShouldBe("Hello");

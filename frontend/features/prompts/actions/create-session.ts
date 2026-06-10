@@ -26,7 +26,6 @@ export async function createSessionAction(
     ).createSession({
       createSessionRequest: {
         input: parsed.data.input,
-        title: null,
         data: null,
       },
     })

@@ -54,7 +54,7 @@
           "Sessions"
         ],
         "summary": "Create session with first prompt",
-        "description": "Creates a new session for the authenticated user and enqueues the first prompt for worker processing. Request body: input (required, max 8000 chars), title (optional, max 200 chars), data (optional context). Returns 201 Created with sessionId, title, and the initial prompt in Pending status. Location header points to /api/Sessions/{sessionId}.",
+        "description": "Creates a new session for the authenticated user and enqueues the first prompt for worker processing. Request body: input (required, max 8000 chars), data (optional context). Session title is derived from the first non-empty line of input (max 200 chars). Returns 201 Created with sessionId, title, and the initial prompt in Pending status. Location header points to /api/Sessions/{sessionId}.",
         "operationId": "CreateSession",
         "requestBody": {
           "content": {
@@ -712,19 +712,12 @@
       "CreateSessionRequest": {
         "required": [
           "input",
-          "title",
           "data"
         ],
         "type": "object",
         "properties": {
           "input": {
             "type": "string"
-          },
-          "title": {
-            "type": [
-              "null",
-              "string"
-            ]
           },
           "data": {
             "type": [

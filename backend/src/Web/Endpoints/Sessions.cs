@@ -22,14 +22,15 @@ public class Sessions : IEndpointGroup
     [EndpointSummary("Create session with first prompt")]
     [EndpointDescription(
         "Creates a new session for the authenticated user and enqueues the first prompt for worker processing. " +
-        "Request body: input (required, max 8000 chars), title (optional, max 200 chars), data (optional context). " +
+        "Request body: input (required, max 8000 chars), data (optional context). " +
+        "Session title is derived from the first non-empty line of input (max 200 chars). " +
         "Returns 201 Created with sessionId, title, and the initial prompt in Pending status. " +
         "Location header points to /api/Sessions/{sessionId}.")]
     public static async Task<Created<CreateSessionResponse>> CreateSession(
         ISender sender,
         CreateSessionRequest request)
     {
-        var result = await sender.Send(new CreateSessionCommand(request.Input, request.Title, request.Data));
+        var result = await sender.Send(new CreateSessionCommand(request.Input, request.Data));
         return TypedResults.Created($"/api/Sessions/{result.SessionId}", result);
     }
 
@@ -60,7 +61,7 @@ public class Sessions : IEndpointGroup
         return TypedResults.Created($"/api/Sessions/{sessionId}/prompts/{result.Id}", result);
     }
 
-    public record CreateSessionRequest(string Input, string? Title, string? Data);
+    public record CreateSessionRequest(string Input, string? Data);
 
     public record CreatePromptRequest(string Input, string? Data);
 }

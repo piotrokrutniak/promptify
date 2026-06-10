@@ -21,7 +21,7 @@ public class CreatePromptTests : TestBase
     {
         await TestApp.RunAsDefaultUserAsync();
 
-        var session = await TestApp.SendAsync(new CreateSessionCommand("first", null, null));
+        var session = await TestApp.SendAsync(new CreateSessionCommand("first", null));
 
         await Should.ThrowAsync<ValidationException>(
             () => TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "", null)));
@@ -32,7 +32,7 @@ public class CreatePromptTests : TestBase
     {
         await TestApp.RunAsDefaultUserAsync();
 
-        var session = await TestApp.SendAsync(new CreateSessionCommand("first", null, null));
+        var session = await TestApp.SendAsync(new CreateSessionCommand("first", null));
 
         await Should.ThrowAsync<ConflictException>(
             () => TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "second", null)));
@@ -43,7 +43,7 @@ public class CreatePromptTests : TestBase
     {
         await TestApp.RunAsDefaultUserAsync();
 
-        var session = await TestApp.SendAsync(new CreateSessionCommand("first", null, null));
+        var session = await TestApp.SendAsync(new CreateSessionCommand("first", null));
 
         await ConsumePromptAsync(session.Prompt.Id, session.SessionId);
 

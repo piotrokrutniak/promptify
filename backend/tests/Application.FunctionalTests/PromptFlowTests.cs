@@ -20,7 +20,7 @@ public class PromptFlowTests : TestBase
     {
         await TestApp.RunAsDefaultUserAsync();
 
-        var response = await TestApp.SendAsync(new CreateSessionCommand("functional test", "title", null));
+        var response = await TestApp.SendAsync(new CreateSessionCommand("functional test", null));
 
         await ConsumePromptAsync(response.Prompt.Id, response.SessionId);
 
@@ -35,7 +35,7 @@ public class PromptFlowTests : TestBase
     {
         await TestApp.RunAsDefaultUserAsync();
 
-        var session = await TestApp.SendAsync(new CreateSessionCommand("first prompt", "title", null));
+        var session = await TestApp.SendAsync(new CreateSessionCommand("first prompt", null));
         await ConsumePromptAsync(session.Prompt.Id, session.SessionId);
 
         var followUp = await TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "second prompt", null));
