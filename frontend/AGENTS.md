@@ -33,13 +33,13 @@ Promptify is a prompt submission and status-tracking system:
 When a task spans backend and frontend:
 
 1. **Backend first** — finish domain, application commands/queries, and endpoints in `../backend/`.
-2. **Regenerate the contract** — with the backend running (`make apphost`), run `npm run generate:api-spec` from `frontend/`. This refreshes `openapi/v1.json` and `src/generated/api/`.
+2. **Regenerate the contract** — with the backend running (`make apphost`), run `npm run generate:api-spec` from `frontend/`. This refreshes `openapi/v1.json` and `generated/api/`.
 3. **Frontend second** — implement UI and `lib/api-client.ts` against the regenerated spec.
 
 **Source of truth**
 
-- `openapi/v1.json` and `src/generated/api/` define the API contract between layers.
-- **Do not hand-edit** anything under `src/generated/api/`.
+- `openapi/v1.json` and `generated/api/` define the API contract between layers.
+- **Do not hand-edit** anything under `generated/api/`.
 - Hand-written fetch helpers in `lib/api-client.ts` must stay aligned with the spec (paths, methods, request/response shapes). Prefer mirroring generated model names and fields.
 
 If backend endpoints or DTOs change, stop and regenerate before continuing frontend work.
@@ -51,7 +51,7 @@ When scaffolding `frontend/`, add these files (adapted from wassup-web):
 **`package.json` script:**
 
 ```json
-"generate:api-spec": "node ./scripts/fetch-openapi.mjs && rm -rf src/generated/api && openapi-generator-cli generate --generator-key v1"
+"generate:api-spec": "node ./scripts/fetch-openapi.mjs && rm -rf generated/api && openapi-generator-cli generate --generator-key v1"
 ```
 
 **`scripts/fetch-openapi.mjs`** — fetches from `https://localhost:<port>/openapi/v1.json` (use Aspire Web API port or `8080` for Docker).
@@ -66,7 +66,7 @@ When scaffolding `frontend/`, add these files (adapted from wassup-web):
       "v1": {
         "generatorName": "typescript-fetch",
         "inputSpec": "openapi/v1.json",
-        "output": "src/generated/api",
+        "output": "generated/api",
         "additionalProperties": {
           "supportsES6": true,
           "typescriptThreePlus": true,

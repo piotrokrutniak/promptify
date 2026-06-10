@@ -1,4 +1,7 @@
-.PHONY: apphost watch test docker-up docker-down docker-down-volumes
+.PHONY: apphost watch test docker-up docker-down docker-down-volumes generate-api
+
+generate-api:
+	cd frontend && npm run generate:api-spec
 
 apphost:
 	cd backend && dotnet run --project ./src/AppHost
