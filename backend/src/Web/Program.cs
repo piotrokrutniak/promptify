@@ -23,17 +23,22 @@ builder.Services.AddSignalR();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Configuration.GetValue("Database:InitializeOnStartup", false))
 {
-    await app.InitialiseDatabaseAsync();
+    var recreate = app.Configuration.GetValue("Database:RecreateOnStartup", false);
+    await app.InitialiseDatabaseAsync(recreate);
 }
-else
+
+if (!app.Environment.IsDevelopment() && !app.Environment.IsEnvironment("Docker"))
 {
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+if (!app.Environment.IsEnvironment("Docker"))
+{
+    app.UseHttpsRedirection();
+}
 app.UseCors(static builder => 
     builder.AllowAnyMethod()
         .AllowAnyHeader()

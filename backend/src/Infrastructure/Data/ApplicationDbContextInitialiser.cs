@@ -9,13 +9,15 @@ namespace PromptifyWebApi.Infrastructure.Data;
 
 public static class InitialiserExtensions
 {
-    public static async Task InitialiseDatabaseAsync(this WebApplication app)
+    public static async Task InitialiseDatabaseAsync(
+        this WebApplication app,
+        bool recreate = true)
     {
         using var scope = app.Services.CreateScope();
 
         var initialiser = scope.ServiceProvider.GetRequiredService<ApplicationDbContextInitialiser>();
 
-        await initialiser.InitialiseAsync();
+        await initialiser.InitialiseAsync(recreate);
         await initialiser.SeedAsync();
     }
 }
@@ -35,12 +37,16 @@ public class ApplicationDbContextInitialiser
         _roleManager = roleManager;
     }
 
-    public async Task InitialiseAsync()
+    public async Task InitialiseAsync(bool recreate = true)
     {
         try
         {
             // See https://jasontaylor.dev/ef-core-database-initialisation-strategies
-            await _context.Database.EnsureDeletedAsync();
+            if (recreate)
+            {
+                await _context.Database.EnsureDeletedAsync();
+            }
+
             await _context.Database.EnsureCreatedAsync();
         }
         catch (Exception ex)

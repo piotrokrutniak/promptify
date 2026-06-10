@@ -1,11 +1,12 @@
 "use server"
 
 import {
+  FetchError,
   HttpValidationProblemDetailsFromJSON,
   ResponseError,
 } from "@/generated/api"
 import { setAuthCookies } from "@/lib/auth/cookies"
-import { createUsersApi } from "@/lib/api-client"
+import { createUsersApi, getApiBaseUrl } from "@/lib/api-client"
 import {
   signInSchema,
   type SignInActionResult,
@@ -35,6 +36,11 @@ export async function signInAction(
     }
   }
 
+  const apiBaseUrl = getApiBaseUrl()
+  const loginUrl = `${apiBaseUrl.replace(/\/+$/, "")}/api/Users/login`
+  console.log("[sign-in] API_BASE_URL:", apiBaseUrl)
+  console.log("[sign-in] POST", loginUrl)
+
   try {
     const tokens = await createUsersApi().apiUsersLoginPost({
       loginRequest: {
@@ -43,17 +49,37 @@ export async function signInAction(
       },
     })
 
+    console.log("[sign-in] success: 200")
     await setAuthCookies(tokens)
     return { ok: true }
   } catch (error) {
+    console.error("[sign-in] error type:", error?.constructor?.name ?? typeof error)
+
     if (error instanceof ResponseError) {
+      const bodyText = await error.response.text().catch(() => "")
+      console.error("[sign-in] ResponseError status:", error.response.status)
+      console.error("[sign-in] ResponseError body:", bodyText.slice(0, 200))
+
       if (error.response.status === 401) {
         return { ok: false, error: "Invalid email or password" }
       }
 
       if (error.response.status === 400) {
-        const body = await error.response.json().catch(() => null)
+        let body: unknown = null
+        try {
+          body = bodyText ? JSON.parse(bodyText) : null
+        } catch {
+          body = null
+        }
         return { ok: false, error: formatValidationError(body) }
+      }
+    }
+
+    if (error instanceof FetchError) {
+      const cause = error.cause
+      console.error("[sign-in] FetchError cause:", cause.message)
+      if ("code" in cause && typeof cause.code === "string") {
+        console.error("[sign-in] FetchError code:", cause.code)
       }
     }
 
