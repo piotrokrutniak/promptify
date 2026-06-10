@@ -43,22 +43,37 @@ export function isAccessTokenExpired(
   }
 }
 
+export type RefreshTokensResult =
+  | { status: "success"; tokens: AccessTokenResponse }
+  | { status: "invalid" }
+  | { status: "unavailable" }
+
 export async function refreshTokens(
   refreshToken: string
-): Promise<AccessTokenResponse | null> {
+): Promise<RefreshTokensResult> {
   const apiBaseUrl = getApiBaseUrl().replace(/\/+$/, "")
-  const response = await fetch(`${apiBaseUrl}/api/Users/refresh`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ refreshToken }),
-  })
 
-  if (!response.ok) {
-    return null
+  try {
+    const response = await fetch(`${apiBaseUrl}/api/Users/refresh`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refreshToken }),
+      signal: AbortSignal.timeout(5000),
+    })
+
+    if (!response.ok) {
+      if (response.status === 401 || response.status === 403) {
+        return { status: "invalid" }
+      }
+
+      return { status: "unavailable" }
+    }
+
+    const body: unknown = await response.json()
+    return { status: "success", tokens: AccessTokenResponseFromJSON(body) }
+  } catch {
+    return { status: "unavailable" }
   }
-
-  const body: unknown = await response.json()
-  return AccessTokenResponseFromJSON(body)
 }
 
 export function applyAuthCookiesToResponse(

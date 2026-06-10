@@ -1,10 +1,6 @@
 import { redirect } from "next/navigation"
 
-import {
-  FetchError,
-  ResponseError,
-  type InfoResponse,
-} from "@/generated/api"
+import { ResponseError, type InfoResponse } from "@/generated/api"
 import { createAuthenticatedUsersApi } from "@/lib/api-client"
 import { getAccessToken } from "@/lib/auth/cookies"
 
@@ -29,10 +25,6 @@ export async function requireAuth(): Promise<AuthSession> {
       error instanceof ResponseError &&
       (error.response.status === 401 || error.response.status === 403)
     ) {
-      redirect("/api/auth/sign-out")
-    }
-
-    if (error instanceof FetchError) {
       redirect("/api/auth/sign-out")
     }
 

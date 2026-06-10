@@ -43,11 +43,15 @@ export async function middleware(request: NextRequest) {
 
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value
   if (refreshToken) {
-    const tokens = await refreshTokens(refreshToken)
-    if (tokens) {
+    const result = await refreshTokens(refreshToken)
+    if (result.status === "success") {
       const response = NextResponse.next()
-      applyAuthCookiesToResponse(response, tokens)
+      applyAuthCookiesToResponse(response, result.tokens)
       return response
+    }
+
+    if (result.status === "unavailable") {
+      return NextResponse.next()
     }
   }
 
