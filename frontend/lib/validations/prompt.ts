@@ -26,3 +26,13 @@ export type CreateSessionActionResult =
 export type CreatePromptActionResult =
   | { ok: true; prompt: PromptDto }
   | { ok: false; error: string }
+
+export const cancelPromptSchema = z.object({
+  promptId: z.number().int().positive(),
+})
+
+export type CancelPromptValues = z.infer<typeof cancelPromptSchema>
+
+export type CancelPromptActionResult =
+  | { ok: true }
+  | { ok: false; error: string }

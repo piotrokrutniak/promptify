@@ -1,4 +1,4 @@
-import { Configuration, SessionsApi, UsersApi } from "@/generated/api"
+import { Configuration, PromptsApi, SessionsApi, UsersApi } from "@/generated/api"
 
 import { getAccessToken } from "@/lib/auth/cookies"
 
@@ -33,4 +33,12 @@ export async function createAuthenticatedSessionsApi() {
     throw new Error("Not authenticated")
   }
   return new SessionsApi(createConfiguration(token))
+}
+
+export async function createAuthenticatedPromptsApi() {
+  const token = await getAccessToken()
+  if (!token) {
+    throw new Error("Not authenticated")
+  }
+  return new PromptsApi(createConfiguration(token))
 }
