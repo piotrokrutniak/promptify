@@ -114,10 +114,10 @@ export function SessionChat(props: SessionChatProps) {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <ChatMessageList prompts={prompts} />
       {error ? (
-        <div className="px-4 pb-2">
+        <div className="shrink-0 px-4 pb-2">
           <FormErrorAlert message={error} />
         </div>
       ) : null}

@@ -21,7 +21,7 @@ export function ChatMessageList({ prompts }: ChatMessageListProps) {
 
   if (prompts.length === 0) {
     return (
-      <div className="flex flex-1 items-center justify-center p-6 text-sm text-muted-foreground">
+      <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-6 text-sm text-muted-foreground">
         No messages yet. Send a prompt to get started.
       </div>
     )
@@ -30,11 +30,13 @@ export function ChatMessageList({ prompts }: ChatMessageListProps) {
   return (
     <div
       ref={scrollRef}
-      className="flex min-h-0 flex-1 flex-col justify-end gap-6 overflow-y-auto px-6 py-4"
+      className="flex min-h-0 flex-1 flex-col overflow-y-auto px-6 py-4"
     >
-      {prompts.map((prompt, index) => (
-        <ChatExchange key={String(prompt.id ?? index)} prompt={prompt} />
-      ))}
+      <div className="mt-auto flex flex-col gap-6">
+        {prompts.map((prompt, index) => (
+          <ChatExchange key={String(prompt.id ?? index)} prompt={prompt} />
+        ))}
+      </div>
     </div>
   )
 }
