@@ -36,6 +36,22 @@ export function ChatComposer({
     }
 
     await onSubmit(message)
+    setInput("")
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === "Escape") {
+      if (canStop && onStop && !isStopping) {
+        event.preventDefault()
+        onStop()
+      }
+      return
+    }
+
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault()
+      event.currentTarget.form?.requestSubmit()
+    }
   }
 
   return (
@@ -46,6 +62,7 @@ export function ChatComposer({
       <textarea
         value={input}
         onChange={(event) => setInput(event.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder="Write a prompt…"
         rows={3}
         disabled={inputDisabled || isLoading || isStopping}
