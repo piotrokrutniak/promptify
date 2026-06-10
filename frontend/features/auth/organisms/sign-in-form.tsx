@@ -50,7 +50,7 @@ export function SignInForm() {
         return
       }
 
-      router.push("/")
+      router.push("/sessions/new")
       router.refresh()
     })
   }

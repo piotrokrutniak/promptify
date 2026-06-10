@@ -11,7 +11,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (hasToken && isSignIn) {
-    return NextResponse.redirect(new URL("/", request.url))
+    return NextResponse.redirect(new URL("/sessions/new", request.url))
   }
 
   return NextResponse.next()

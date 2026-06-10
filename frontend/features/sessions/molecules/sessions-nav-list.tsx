@@ -1,30 +1,24 @@
 import type { SessionListItemDto } from "@/generated/api"
 import { SidebarMenu } from "@/components/ui/sidebar"
+import { NewSessionNavLink } from "@/features/sessions/atoms/new-session-nav-link"
 import { SessionNavLink } from "@/features/sessions/atoms/session-nav-link"
+import { parseSessionId } from "@/lib/sessions/parse-id"
 
 type SessionsNavListProps = {
   sessions: SessionListItemDto[]
 }
 
-function getSessionId(session: SessionListItemDto): number | undefined {
-  const id = session.id
-  if (typeof id === "number") {
-    return id
-  }
-  return undefined
-}
-
 export function SessionsNavList({ sessions }: SessionsNavListProps) {
-  if (sessions.length === 0) {
-    return (
-      <p className="px-2 text-sm text-muted-foreground">No sessions yet</p>
-    )
-  }
-
   return (
     <SidebarMenu>
+      <NewSessionNavLink />
+      {sessions.length === 0 ? (
+        <li className="px-2 py-1 text-sm text-muted-foreground">
+          No sessions yet
+        </li>
+      ) : null}
       {sessions.map((session) => {
-        const sessionId = getSessionId(session)
+        const sessionId = parseSessionId(session.id)
         if (sessionId === undefined) {
           return null
         }

@@ -20,11 +20,11 @@ export function AppShell({ user, sessions, children }: AppShellProps) {
     <TooltipProvider>
       <SidebarProvider>
         <AppSidebar user={user} sessions={sessions} />
-        <SidebarInset>
+        <SidebarInset className="min-h-svh">
           <header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
             <SidebarTrigger />
           </header>
-          <div className="flex flex-1 flex-col p-6">{children}</div>
+          <div className="flex min-h-0 flex-1 flex-col p-6">{children}</div>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

@@ -1,16 +1,43 @@
+import { notFound, redirect } from "next/navigation"
+
+import { ResponseError } from "@/generated/api"
+import { SessionChat } from "@/features/prompts"
+import { createAuthenticatedSessionsApi } from "@/lib/api-client"
+import { parseSessionId } from "@/lib/sessions/parse-id"
+
 type SessionPageProps = {
   params: Promise<{ sessionId: string }>
 }
 
+async function loadSession(sessionId: number) {
+  try {
+    return await (
+      await createAuthenticatedSessionsApi()
+    ).getSessionById({ sessionId })
+  } catch (error) {
+    if (error instanceof ResponseError && error.response.status === 404) {
+      notFound()
+    }
+
+    throw error
+  }
+}
+
 export default async function SessionPage({ params }: SessionPageProps) {
-  const { sessionId } = await params
+  const { sessionId: sessionIdParam } = await params
+  const sessionId = parseSessionId(sessionIdParam)
+
+  if (sessionId === undefined) {
+    redirect("/sessions/new")
+  }
+
+  const session = await loadSession(sessionId)
 
   return (
-    <div className="flex flex-col gap-2">
-      <h1 className="text-lg font-medium">Session {sessionId}</h1>
-      <p className="text-sm text-muted-foreground">
-        Prompt workspace coming soon.
-      </p>
-    </div>
+    <SessionChat
+      mode="existing"
+      sessionId={sessionId}
+      initialPrompts={session.prompts ?? []}
+    />
   )
 }
