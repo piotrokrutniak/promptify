@@ -7,7 +7,7 @@ using PromptifyWebApi.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace PromptifyWebApi.Worker.Consumers;
+namespace PromptifyWebApi.Infrastructure.Consumers;
 
 public class ProcessPromptConsumer : IConsumer<ProcessPromptCommand>
 {

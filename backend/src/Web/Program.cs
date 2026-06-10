@@ -13,7 +13,11 @@ builder.AddKeyVaultIfConfigured();
 builder.AddApplicationServices();
 builder.AddInfrastructureServices();
 builder.AddWebServices();
-builder.AddPromptifyMessaging(x => x.AddConsumer<PromptStatusChangedConsumer>());
+if (!builder.Configuration.GetValue<bool>("FunctionalTesting:DisableMessaging"))
+{
+    builder.AddPromptifyMessaging(x => x.AddConsumer<PromptStatusChangedConsumer>());
+}
+
 builder.Services.AddSignalR();
 
 var app = builder.Build();

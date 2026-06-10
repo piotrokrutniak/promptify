@@ -1,8 +1,12 @@
+using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
 using PromptifyWebApi.Application.FunctionalTests.Infrastructure;
 using PromptifyWebApi.Application.Sessions.Commands.CreateSession;
 using PromptifyWebApi.Domain.Entities;
 using PromptifyWebApi.Domain.Enums;
-using Microsoft.EntityFrameworkCore;
+using PromptifyWebApi.Infrastructure.Consumers;
+using PromptifyWebApi.Shared.Messaging;
+using Moq;
 using NUnit.Framework;
 using Shouldly;
 
@@ -17,25 +21,21 @@ public class PromptFlowTests : TestBase
 
         var response = await TestApp.SendAsync(new CreateSessionCommand("functional test", "title", null));
 
-        var deadline = DateTime.UtcNow.AddSeconds(60);
-        PromptStatus? status = null;
-
-        while (DateTime.UtcNow < deadline)
+        using (var scope = FunctionalTestSetup.ScopeFactory.CreateScope())
         {
-            var prompt = await TestApp.FindAsync<Prompt>(response.Prompt.Id);
-            status = prompt?.Status;
+            var consumer = scope.ServiceProvider.GetRequiredService<ProcessPromptConsumer>();
 
-            if (status is PromptStatus.Completed or PromptStatus.Failed)
-            {
-                break;
-            }
+            var consumeContext = new Mock<ConsumeContext<ProcessPromptCommand>>();
+            consumeContext.Setup(c => c.Message)
+                .Returns(new ProcessPromptCommand(response.Prompt.Id, response.SessionId));
+            consumeContext.Setup(c => c.CancellationToken).Returns(CancellationToken.None);
 
-            await Task.Delay(500);
+            await consumer.Consume(consumeContext.Object);
         }
 
-        status.ShouldBe(PromptStatus.Completed);
-
         var completed = await TestApp.FindAsync<Prompt>(response.Prompt.Id);
-        completed!.Output.ShouldNotBeNullOrWhiteSpace();
+        completed.ShouldNotBeNull();
+        completed!.Status.ShouldBe(PromptStatus.Completed);
+        completed.Output.ShouldNotBeNullOrWhiteSpace();
     }
 }

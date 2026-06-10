@@ -1,3 +1,4 @@
+using PromptifyWebApi.Infrastructure.Data;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace PromptifyWebApi.Application.FunctionalTests;
@@ -38,13 +39,18 @@ public class FunctionalTestSetup
         await _app.ResourceNotifications.WaitForResourceHealthyAsync(
             Services.Database, cancellationToken);
 
-        await _app.ResourceNotifications.WaitForResourceHealthyAsync(
-            Services.Messaging, cancellationToken);
-
         var connectionString = (await _app.GetConnectionStringAsync(Services.Database))!;
-        var messagingConnectionString = (await _app.GetConnectionStringAsync(Services.Messaging))!;
 
-        _factory = new WebApiFactory(connectionString, messagingConnectionString);
+        _factory = new WebApiFactory(connectionString);
+
+        _ = _factory.CreateClient();
+
+        await using (var scope = _factory.Services.CreateAsyncScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            await context.Database.EnsureCreatedAsync(cancellationToken);
+        }
+
         ScopeFactory = _factory.Services.GetRequiredService<IServiceScopeFactory>();
         DbResetter = await DatabaseResetter.CreateAsync(connectionString);
     }

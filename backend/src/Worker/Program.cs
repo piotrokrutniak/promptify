@@ -1,7 +1,7 @@
 using PromptifyWebApi.Application.Common.Interfaces;
+using PromptifyWebApi.Infrastructure.Consumers;
 using PromptifyWebApi.Infrastructure.Identity;
 using PromptifyWebApi.Infrastructure.Messaging;
-using PromptifyWebApi.Worker.Consumers;
 
 var builder = Host.CreateApplicationBuilder(args);
 

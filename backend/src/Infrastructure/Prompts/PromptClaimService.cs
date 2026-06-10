@@ -22,46 +22,42 @@ public class PromptClaimService
         _logger = logger;
     }
 
-    public async Task<Prompt?> ClaimPromptByIdAsync(int promptId, CancellationToken cancellationToken)
+    public Task<Prompt?> ClaimPromptByIdAsync(int promptId, CancellationToken cancellationToken)
     {
-        await using var transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+        var strategy = _context.Database.CreateExecutionStrategy();
 
-        var pending = nameof(PromptStatus.Pending);
-        var claimedId = await _context.Database
-            .SqlQuery<int?>($"""
-                SELECT p."Id" AS "Value"
-                FROM "Prompts" AS p
-                WHERE p."Id" = {promptId}
-                  AND p."Status" = {pending}
-                FOR UPDATE OF p SKIP LOCKED
-                """)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if (claimedId is null)
+        return strategy.ExecuteAsync(async () =>
         {
-            await transaction.RollbackAsync(cancellationToken);
-            return null;
-        }
+            var now = _timeProvider.GetUtcNow();
 
-        var prompt = await _context.Prompts
-            .FirstOrDefaultAsync(p => p.Id == claimedId, cancellationToken);
+            var rowsUpdated = await _context.Prompts
+                .Where(p => p.Id == promptId && p.Status == PromptStatus.Pending)
+                .ExecuteUpdateAsync(
+                    setters => setters
+                        .SetProperty(p => p.Status, PromptStatus.Processing)
+                        .SetProperty(p => p.ProcessingStartedAt, now)
+                        .SetProperty(p => p.LastModified, now),
+                    cancellationToken);
 
-        if (prompt is null)
-        {
-            await transaction.RollbackAsync(cancellationToken);
-            return null;
-        }
+            if (rowsUpdated == 0)
+            {
+                return null;
+            }
 
-        var now = _timeProvider.GetUtcNow();
-        prompt.Status = PromptStatus.Processing;
-        prompt.ProcessingStartedAt = now;
-        prompt.LastModified = now;
+            var prompt = await _context.Prompts
+                .FirstOrDefaultAsync(p => p.Id == promptId, cancellationToken);
 
-        await _context.SaveChangesAsync(cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
+            if (prompt is null)
+            {
+                return null;
+            }
 
-        _logger.LogInformation("Claimed prompt {PromptId} in session {SessionId}", prompt.Id, prompt.SessionId);
+            _logger.LogInformation(
+                "Claimed prompt {PromptId} in session {SessionId}",
+                prompt.Id,
+                prompt.SessionId);
 
-        return prompt;
+            return prompt;
+        });
     }
 }

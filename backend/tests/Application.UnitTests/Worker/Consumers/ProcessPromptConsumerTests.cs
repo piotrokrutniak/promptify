@@ -5,7 +5,7 @@ using PromptifyWebApi.Domain.Enums;
 using PromptifyWebApi.Infrastructure.Data;
 using PromptifyWebApi.Infrastructure.Prompts;
 using PromptifyWebApi.Shared.Messaging;
-using PromptifyWebApi.Worker.Consumers;
+using PromptifyWebApi.Infrastructure.Consumers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;

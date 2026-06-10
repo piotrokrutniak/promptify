@@ -1,4 +1,7 @@
+using MassTransit;
 using PromptifyWebApi.Application.Common.Interfaces;
+using PromptifyWebApi.Infrastructure.Consumers;
+using PromptifyWebApi.Web;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -7,14 +10,16 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace PromptifyWebApi.Application.FunctionalTests.Infrastructure;
 
-public class WebApiFactory(string connectionString, string messagingConnectionString) : WebApplicationFactory<Program>
+public class WebApiFactory(string connectionString) : WebApplicationFactory<WebApplicationEntryPoint>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        builder.UseEnvironment("FunctionalTesting");
+
         builder
             .UseSetting("ConnectionStrings:PromptifyWebApiDb", connectionString)
-            .UseSetting("ConnectionStrings:messaging", messagingConnectionString)
-            .UseSetting("Llm:MockDelayMs", "0");
+            .UseSetting("Llm:MockDelayMs", "0")
+            .UseSetting("FunctionalTesting:DisableMessaging", "true");
 
         builder.ConfigureTestServices(services =>
         {
@@ -27,6 +32,10 @@ public class WebApiFactory(string connectionString, string messagingConnectionSt
                     mock.SetupGet(x => x.Id).Returns(TestApp.GetUserId());
                     return mock.Object;
                 });
+
+            services.RemoveAll<IPublishEndpoint>();
+            services.AddSingleton(Mock.Of<IPublishEndpoint>());
+            services.AddScoped<ProcessPromptConsumer>();
         });
     }
 }
