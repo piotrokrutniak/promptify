@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useCallback, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 
 import type { PromptDto } from "@/generated/api"
@@ -10,15 +10,23 @@ import { createPromptAction } from "@/features/prompts/actions/create-prompt"
 import { createSessionAction } from "@/features/prompts/actions/create-session"
 import { ChatComposer } from "@/features/prompts/molecules/chat-composer"
 import { ChatMessageList } from "@/features/prompts/molecules/chat-message-list"
+import { usePromptStatusHub } from "@/hooks/use-prompt-status-hub"
 import {
   getPendingPromptId,
   isSessionIdle,
 } from "@/lib/prompts/session-idle"
+import { applyPromptStatusChanged } from "@/lib/signalr/prompt-status-changed"
 import { parseSessionId } from "@/lib/sessions/parse-id"
 
 export type SessionChatProps =
   | { mode: "new" }
-  | { mode: "existing"; sessionId: number; initialPrompts: PromptDto[] }
+  | {
+      mode: "existing"
+      sessionId: number
+      initialPrompts: PromptDto[]
+      accessToken: string
+      hubUrl: string
+    }
 
 export function SessionChat(props: SessionChatProps) {
   const router = useRouter()
@@ -30,6 +38,21 @@ export function SessionChat(props: SessionChatProps) {
   const [prompts, setPrompts] = useState<PromptDto[]>(
     props.mode === "existing" ? props.initialPrompts : []
   )
+
+  const handleStatusChanged = useCallback(
+    (message: Parameters<typeof applyPromptStatusChanged>[1]) => {
+      setPrompts((current) => applyPromptStatusChanged(current, message))
+    },
+    []
+  )
+
+  usePromptStatusHub({
+    hubUrl: props.mode === "existing" ? props.hubUrl : "",
+    accessToken: props.mode === "existing" ? props.accessToken : "",
+    sessionId: props.mode === "existing" ? props.sessionId : 0,
+    onStatusChanged: handleStatusChanged,
+    enabled: props.mode === "existing",
+  })
 
   const isIdle = isSessionIdle(prompts)
   const pendingPromptId = getPendingPromptId(prompts)
@@ -64,7 +87,6 @@ export function SessionChat(props: SessionChatProps) {
       }
 
       setPrompts((current) => [...current, result.prompt])
-      router.refresh()
     })
   }
 
@@ -88,7 +110,6 @@ export function SessionChat(props: SessionChatProps) {
             : prompt
         )
       )
-      router.refresh()
     })
   }
 
