@@ -6,7 +6,7 @@
 *.suo
 .vs/
 
-# Node (future frontend)
+# Frontend (Next.js)
 node_modules/
 .next/
 out/
