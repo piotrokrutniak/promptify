@@ -3,6 +3,7 @@ using PromptifyWebApi.Application.Common.Interfaces;
 using PromptifyWebApi.Infrastructure.Data;
 using PromptifyWebApi.Web.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json.Serialization;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -23,6 +24,11 @@ public static class DependencyInjection
             options.SuppressModelStateInvalidFilter = true);
 
         builder.Services.AddEndpointsApiExplorer();
+
+        builder.Services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+        });
 
         builder.Services.AddOpenApi(options =>
         {

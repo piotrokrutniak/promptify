@@ -2,7 +2,6 @@
 
 import { ResponseError } from "@/generated/api"
 import { createAuthenticatedSessionsApi } from "@/lib/api-client"
-import { parseSessionId } from "@/lib/sessions/parse-id"
 import {
   createSessionSchema,
   type CreateSessionActionResult,
@@ -30,7 +29,7 @@ export async function createSessionAction(
       },
     })
 
-    const sessionId = parseSessionId(response.sessionId)
+    const sessionId = response.sessionId
     if (sessionId === undefined) {
       return { ok: false, error: "Session created but no session id returned" }
     }

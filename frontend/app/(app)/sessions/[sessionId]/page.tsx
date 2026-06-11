@@ -7,7 +7,7 @@ import {
   getPromptStatusHubUrl,
 } from "@/lib/api-client"
 import { requireAuth } from "@/lib/auth/require-auth"
-import { parseSessionId } from "@/lib/sessions/parse-id"
+import { parseRouteId } from "@/lib/sessions/parse-id"
 
 type SessionPageProps = {
   params: Promise<{ sessionId: string }>
@@ -29,7 +29,7 @@ async function loadSession(sessionId: number) {
 
 export default async function SessionPage({ params }: SessionPageProps) {
   const { sessionId: sessionIdParam } = await params
-  const sessionId = parseSessionId(sessionIdParam)
+  const sessionId = parseRouteId(sessionIdParam)
 
   if (sessionId === undefined) {
     redirect("/sessions/new")

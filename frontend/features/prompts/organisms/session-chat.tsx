@@ -19,7 +19,6 @@ import {
 } from "@/lib/prompts/session-idle"
 import { upsertPrompt } from "@/lib/prompts/upsert-prompt"
 import { applyPromptStatusChanged } from "@/lib/signalr/prompt-status-changed"
-import { parseSessionId } from "@/lib/sessions/parse-id"
 
 export type SessionChatProps =
   | { mode: "new" }
@@ -104,8 +103,7 @@ export function SessionChat(props: SessionChatProps) {
     setCancellingPromptId(promptId)
 
     const textToRestore =
-      prompts.find((prompt) => parseSessionId(prompt.id) === promptId)?.input ??
-      ""
+      prompts.find((prompt) => prompt.id === promptId)?.input ?? ""
 
     startTransition(async () => {
       const result = await cancelPromptAction({ promptId })
@@ -118,9 +116,7 @@ export function SessionChat(props: SessionChatProps) {
 
       setPrompts((current) =>
         current.map((prompt) =>
-          parseSessionId(prompt.id) === promptId
-            ? { ...prompt, status: "Cancelled" }
-            : prompt
+          prompt.id === promptId ? { ...prompt, status: "Cancelled" } : prompt
         )
       )
       setRestoreDraft({ text: textToRestore, at: Date.now() })

@@ -2,7 +2,6 @@ import type { SessionListItemDto } from "@/generated/api"
 import { SidebarMenu } from "@/components/ui/sidebar"
 import { NewSessionNavLink } from "@/features/sessions/atoms/new-session-nav-link"
 import { SessionNavLink } from "@/features/sessions/atoms/session-nav-link"
-import { parseSessionId } from "@/lib/sessions/parse-id"
 
 type SessionsNavListProps = {
   sessions: SessionListItemDto[]
@@ -18,7 +17,7 @@ export function SessionsNavList({ sessions }: SessionsNavListProps) {
         </li>
       ) : null}
       {sessions.map((session) => {
-        const sessionId = parseSessionId(session.id)
+        const sessionId = session.id
         if (sessionId === undefined) {
           return null
         }

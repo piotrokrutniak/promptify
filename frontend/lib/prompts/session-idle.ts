@@ -1,5 +1,4 @@
 import type { PromptDto } from "@/generated/api"
-import { parseSessionId } from "@/lib/sessions/parse-id"
 
 const IN_FLIGHT_STATUSES = new Set(["Pending", "Processing"])
 
@@ -16,12 +15,10 @@ export function getInFlightPromptId(prompts: PromptDto[]): number | undefined {
       continue
     }
 
-    const id = parseSessionId(prompt.id)
-    if (id !== undefined) {
-      return id
+    if (prompt.id !== undefined) {
+      return prompt.id
     }
   }
 
   return undefined
 }
-

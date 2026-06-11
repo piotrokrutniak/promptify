@@ -53,6 +53,7 @@ Run all tests: `make test` from repo root.
 - `operationId` is derived from the handler method name — must be a named static method
 - `ApiExceptionOperationTransformer` auto-adds `400` to all operations; `401`/`403` on authorized endpoints
 - Request/response schemas come from handler parameter types and `TypedResults` return types
+- `JsonNumberHandling.Strict` is configured in `Web/DependencyInjection.cs` so int32 fields emit plain `integer` in OpenAPI (not `integer | string` unions)
 - After changing endpoints or DTOs: build backend, then regenerate frontend clients (see `../frontend/AGENTS.md`)
 
 ## Session and prompt rules

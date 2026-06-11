@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { CancelPromptPromptIdParameter } from './CancelPromptPromptIdParameter';
-import {
-    CancelPromptPromptIdParameterFromJSON,
-    CancelPromptPromptIdParameterFromJSONTyped,
-    CancelPromptPromptIdParameterToJSON,
-    CancelPromptPromptIdParameterToJSONTyped,
-} from './CancelPromptPromptIdParameter';
-
 /**
  * 
  * @export
@@ -29,16 +21,16 @@ import {
 export interface PromptDto {
     /**
      * 
-     * @type {CancelPromptPromptIdParameter}
+     * @type {number}
      * @memberof PromptDto
      */
-    id?: CancelPromptPromptIdParameter;
+    id?: number;
     /**
      * 
-     * @type {CancelPromptPromptIdParameter}
+     * @type {number}
      * @memberof PromptDto
      */
-    orderIndex?: CancelPromptPromptIdParameter;
+    orderIndex?: number;
     /**
      * 
      * @type {string}
@@ -88,8 +80,8 @@ export function PromptDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     }
     return {
         
-        'id': json['id'] == null ? undefined : CancelPromptPromptIdParameterFromJSON(json['id']),
-        'orderIndex': json['orderIndex'] == null ? undefined : CancelPromptPromptIdParameterFromJSON(json['orderIndex']),
+        'id': json['id'] == null ? undefined : json['id'],
+        'orderIndex': json['orderIndex'] == null ? undefined : json['orderIndex'],
         'status': json['status'] == null ? undefined : json['status'],
         'input': json['input'] == null ? undefined : json['input'],
         'output': json['output'] == null ? undefined : json['output'],
@@ -109,8 +101,8 @@ export function PromptDtoToJSONTyped(value?: PromptDto | null, ignoreDiscriminat
 
     return {
         
-        'id': CancelPromptPromptIdParameterToJSON(value['id']),
-        'orderIndex': CancelPromptPromptIdParameterToJSON(value['orderIndex']),
+        'id': value['id'],
+        'orderIndex': value['orderIndex'],
         'status': value['status'],
         'input': value['input'],
         'output': value['output'],

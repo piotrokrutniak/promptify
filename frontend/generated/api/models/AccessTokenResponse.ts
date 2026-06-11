@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { AccessTokenResponseExpiresIn } from './AccessTokenResponseExpiresIn';
-import {
-    AccessTokenResponseExpiresInFromJSON,
-    AccessTokenResponseExpiresInFromJSONTyped,
-    AccessTokenResponseExpiresInToJSON,
-    AccessTokenResponseExpiresInToJSONTyped,
-} from './AccessTokenResponseExpiresIn';
-
 /**
  * 
  * @export
@@ -41,10 +33,10 @@ export interface AccessTokenResponse {
     accessToken: string;
     /**
      * 
-     * @type {AccessTokenResponseExpiresIn}
+     * @type {number}
      * @memberof AccessTokenResponse
      */
-    expiresIn: AccessTokenResponseExpiresIn;
+    expiresIn: number;
     /**
      * 
      * @type {string}
@@ -75,7 +67,7 @@ export function AccessTokenResponseFromJSONTyped(json: any, ignoreDiscriminator:
         
         'tokenType': json['tokenType'] == null ? undefined : json['tokenType'],
         'accessToken': json['accessToken'],
-        'expiresIn': AccessTokenResponseExpiresInFromJSON(json['expiresIn']),
+        'expiresIn': json['expiresIn'],
         'refreshToken': json['refreshToken'],
     };
 }
@@ -93,7 +85,7 @@ export function AccessTokenResponseToJSONTyped(value?: AccessTokenResponse | nul
         
         'tokenType': value['tokenType'],
         'accessToken': value['accessToken'],
-        'expiresIn': AccessTokenResponseExpiresInToJSON(value['expiresIn']),
+        'expiresIn': value['expiresIn'],
         'refreshToken': value['refreshToken'],
     };
 }

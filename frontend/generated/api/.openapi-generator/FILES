@@ -5,14 +5,11 @@ apis/UsersApi.ts
 apis/index.ts
 index.ts
 models/AccessTokenResponse.ts
-models/AccessTokenResponseExpiresIn.ts
-models/CancelPromptPromptIdParameter.ts
 models/CreatePromptRequest.ts
 models/CreateSessionRequest.ts
 models/CreateSessionResponse.ts
 models/ForgotPasswordRequest.ts
 models/HttpValidationProblemDetails.ts
-models/HttpValidationProblemDetailsStatus.ts
 models/InfoRequest.ts
 models/InfoResponse.ts
 models/LoginRequest.ts

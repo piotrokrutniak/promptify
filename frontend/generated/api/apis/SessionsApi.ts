@@ -15,7 +15,6 @@
 
 import * as runtime from '../runtime';
 import type {
-  CancelPromptPromptIdParameter,
   CreatePromptRequest,
   CreateSessionRequest,
   CreateSessionResponse,
@@ -24,8 +23,6 @@ import type {
   SessionListItemDto,
 } from '../models/index';
 import {
-    CancelPromptPromptIdParameterFromJSON,
-    CancelPromptPromptIdParameterToJSON,
     CreatePromptRequestFromJSON,
     CreatePromptRequestToJSON,
     CreateSessionRequestFromJSON,
@@ -41,7 +38,7 @@ import {
 } from '../models/index';
 
 export interface CreatePromptOperationRequest {
-    sessionId: CancelPromptPromptIdParameter;
+    sessionId: number;
     createPromptRequest: CreatePromptRequest;
 }
 
@@ -50,7 +47,7 @@ export interface CreateSessionOperationRequest {
 }
 
 export interface GetSessionByIdRequest {
-    sessionId: CancelPromptPromptIdParameter;
+    sessionId: number;
 }
 
 /**

@@ -20,13 +20,6 @@ import {
     PromptDtoToJSON,
     PromptDtoToJSONTyped,
 } from './PromptDto';
-import type { CancelPromptPromptIdParameter } from './CancelPromptPromptIdParameter';
-import {
-    CancelPromptPromptIdParameterFromJSON,
-    CancelPromptPromptIdParameterFromJSONTyped,
-    CancelPromptPromptIdParameterToJSON,
-    CancelPromptPromptIdParameterToJSONTyped,
-} from './CancelPromptPromptIdParameter';
 
 /**
  * 
@@ -36,10 +29,10 @@ import {
 export interface CreateSessionResponse {
     /**
      * 
-     * @type {CancelPromptPromptIdParameter}
+     * @type {number}
      * @memberof CreateSessionResponse
      */
-    sessionId?: CancelPromptPromptIdParameter;
+    sessionId?: number;
     /**
      * 
      * @type {string}
@@ -71,7 +64,7 @@ export function CreateSessionResponseFromJSONTyped(json: any, ignoreDiscriminato
     }
     return {
         
-        'sessionId': json['sessionId'] == null ? undefined : CancelPromptPromptIdParameterFromJSON(json['sessionId']),
+        'sessionId': json['sessionId'] == null ? undefined : json['sessionId'],
         'title': json['title'] == null ? undefined : json['title'],
         'prompt': json['prompt'] == null ? undefined : PromptDtoFromJSON(json['prompt']),
     };
@@ -88,7 +81,7 @@ export function CreateSessionResponseToJSONTyped(value?: CreateSessionResponse |
 
     return {
         
-        'sessionId': CancelPromptPromptIdParameterToJSON(value['sessionId']),
+        'sessionId': value['sessionId'],
         'title': value['title'],
         'prompt': PromptDtoToJSON(value['prompt']),
     };

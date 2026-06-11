@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { CancelPromptPromptIdParameter } from './CancelPromptPromptIdParameter';
-import {
-    CancelPromptPromptIdParameterFromJSON,
-    CancelPromptPromptIdParameterFromJSONTyped,
-    CancelPromptPromptIdParameterToJSON,
-    CancelPromptPromptIdParameterToJSONTyped,
-} from './CancelPromptPromptIdParameter';
-
 /**
  * 
  * @export
@@ -29,10 +21,10 @@ import {
 export interface SessionListItemDto {
     /**
      * 
-     * @type {CancelPromptPromptIdParameter}
+     * @type {number}
      * @memberof SessionListItemDto
      */
-    id?: CancelPromptPromptIdParameter;
+    id?: number;
     /**
      * 
      * @type {string}
@@ -70,7 +62,7 @@ export function SessionListItemDtoFromJSONTyped(json: any, ignoreDiscriminator: 
     }
     return {
         
-        'id': json['id'] == null ? undefined : CancelPromptPromptIdParameterFromJSON(json['id']),
+        'id': json['id'] == null ? undefined : json['id'],
         'title': json['title'] == null ? undefined : json['title'],
         'created': json['created'] == null ? undefined : (new Date(json['created'])),
         'lastModified': json['lastModified'] == null ? undefined : (new Date(json['lastModified'])),
@@ -88,7 +80,7 @@ export function SessionListItemDtoToJSONTyped(value?: SessionListItemDto | null,
 
     return {
         
-        'id': CancelPromptPromptIdParameterToJSON(value['id']),
+        'id': value['id'],
         'title': value['title'],
         'created': value['created'] == null ? undefined : ((value['created']).toISOString()),
         'lastModified': value['lastModified'] == null ? undefined : ((value['lastModified']).toISOString()),

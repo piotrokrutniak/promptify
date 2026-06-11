@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { CancelPromptPromptIdParameter } from './CancelPromptPromptIdParameter';
-import {
-    CancelPromptPromptIdParameterFromJSON,
-    CancelPromptPromptIdParameterFromJSONTyped,
-    CancelPromptPromptIdParameterToJSON,
-    CancelPromptPromptIdParameterToJSONTyped,
-} from './CancelPromptPromptIdParameter';
-
 /**
  * 
  * @export
@@ -35,10 +27,10 @@ export interface TwoFactorResponse {
     sharedKey: string;
     /**
      * 
-     * @type {CancelPromptPromptIdParameter}
+     * @type {number}
      * @memberof TwoFactorResponse
      */
-    recoveryCodesLeft: CancelPromptPromptIdParameter;
+    recoveryCodesLeft: number;
     /**
      * 
      * @type {Array<string>}
@@ -81,7 +73,7 @@ export function TwoFactorResponseFromJSONTyped(json: any, ignoreDiscriminator: b
     return {
         
         'sharedKey': json['sharedKey'],
-        'recoveryCodesLeft': CancelPromptPromptIdParameterFromJSON(json['recoveryCodesLeft']),
+        'recoveryCodesLeft': json['recoveryCodesLeft'],
         'recoveryCodes': json['recoveryCodes'] == null ? undefined : json['recoveryCodes'],
         'isTwoFactorEnabled': json['isTwoFactorEnabled'],
         'isMachineRemembered': json['isMachineRemembered'],
@@ -100,7 +92,7 @@ export function TwoFactorResponseToJSONTyped(value?: TwoFactorResponse | null, i
     return {
         
         'sharedKey': value['sharedKey'],
-        'recoveryCodesLeft': CancelPromptPromptIdParameterToJSON(value['recoveryCodesLeft']),
+        'recoveryCodesLeft': value['recoveryCodesLeft'],
         'recoveryCodes': value['recoveryCodes'],
         'isTwoFactorEnabled': value['isTwoFactorEnabled'],
         'isMachineRemembered': value['isMachineRemembered'],

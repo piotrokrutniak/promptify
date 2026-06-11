@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { HttpValidationProblemDetailsStatus } from './HttpValidationProblemDetailsStatus';
-import {
-    HttpValidationProblemDetailsStatusFromJSON,
-    HttpValidationProblemDetailsStatusFromJSONTyped,
-    HttpValidationProblemDetailsStatusToJSON,
-    HttpValidationProblemDetailsStatusToJSONTyped,
-} from './HttpValidationProblemDetailsStatus';
-
 /**
  * 
  * @export
@@ -41,10 +33,10 @@ export interface HttpValidationProblemDetails {
     title?: string | null;
     /**
      * 
-     * @type {HttpValidationProblemDetailsStatus}
+     * @type {number}
      * @memberof HttpValidationProblemDetails
      */
-    status?: HttpValidationProblemDetailsStatus | null;
+    status?: number | null;
     /**
      * 
      * @type {string}
@@ -84,7 +76,7 @@ export function HttpValidationProblemDetailsFromJSONTyped(json: any, ignoreDiscr
         
         'type': json['type'] == null ? undefined : json['type'],
         'title': json['title'] == null ? undefined : json['title'],
-        'status': json['status'] == null ? undefined : HttpValidationProblemDetailsStatusFromJSON(json['status']),
+        'status': json['status'] == null ? undefined : json['status'],
         'detail': json['detail'] == null ? undefined : json['detail'],
         'instance': json['instance'] == null ? undefined : json['instance'],
         'errors': json['errors'] == null ? undefined : json['errors'],
@@ -104,7 +96,7 @@ export function HttpValidationProblemDetailsToJSONTyped(value?: HttpValidationPr
         
         'type': value['type'],
         'title': value['title'],
-        'status': HttpValidationProblemDetailsStatusToJSON(value['status']),
+        'status': value['status'],
         'detail': value['detail'],
         'instance': value['instance'],
         'errors': value['errors'],

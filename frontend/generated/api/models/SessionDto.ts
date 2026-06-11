@@ -20,13 +20,6 @@ import {
     PromptDtoToJSON,
     PromptDtoToJSONTyped,
 } from './PromptDto';
-import type { CancelPromptPromptIdParameter } from './CancelPromptPromptIdParameter';
-import {
-    CancelPromptPromptIdParameterFromJSON,
-    CancelPromptPromptIdParameterFromJSONTyped,
-    CancelPromptPromptIdParameterToJSON,
-    CancelPromptPromptIdParameterToJSONTyped,
-} from './CancelPromptPromptIdParameter';
 
 /**
  * 
@@ -36,10 +29,10 @@ import {
 export interface SessionDto {
     /**
      * 
-     * @type {CancelPromptPromptIdParameter}
+     * @type {number}
      * @memberof SessionDto
      */
-    id?: CancelPromptPromptIdParameter;
+    id?: number;
     /**
      * 
      * @type {string}
@@ -77,7 +70,7 @@ export function SessionDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     }
     return {
         
-        'id': json['id'] == null ? undefined : CancelPromptPromptIdParameterFromJSON(json['id']),
+        'id': json['id'] == null ? undefined : json['id'],
         'title': json['title'] == null ? undefined : json['title'],
         'created': json['created'] == null ? undefined : (new Date(json['created'])),
         'prompts': json['prompts'] == null ? undefined : ((json['prompts'] as Array<any>).map(PromptDtoFromJSON)),
@@ -95,7 +88,7 @@ export function SessionDtoToJSONTyped(value?: SessionDto | null, ignoreDiscrimin
 
     return {
         
-        'id': CancelPromptPromptIdParameterToJSON(value['id']),
+        'id': value['id'],
         'title': value['title'],
         'created': value['created'] == null ? undefined : ((value['created']).toISOString()),
         'prompts': value['prompts'] == null ? undefined : ((value['prompts'] as Array<any>).map(PromptDtoToJSON)),

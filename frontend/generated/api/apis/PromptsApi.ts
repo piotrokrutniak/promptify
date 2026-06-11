@@ -14,16 +14,9 @@
 
 
 import * as runtime from '../runtime';
-import type {
-  CancelPromptPromptIdParameter,
-} from '../models/index';
-import {
-    CancelPromptPromptIdParameterFromJSON,
-    CancelPromptPromptIdParameterToJSON,
-} from '../models/index';
 
 export interface CancelPromptRequest {
-    promptId: CancelPromptPromptIdParameter;
+    promptId: number;
 }
 
 /**
