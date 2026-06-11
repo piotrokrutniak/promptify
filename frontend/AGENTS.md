@@ -7,20 +7,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Frontend agent guide
 
-**Status:** not yet scaffolded (phase 05 deferred). This file defines the workflow to follow when `frontend/` is created.
+Before substantial work, review `../docs/architecture.md`.
 
-Before substantial work, review `../docs/00-requirements.md`, `../docs/05-frontend.md`, and `../docs/07-api-worker-integration.md`.
-
-# Product context
-
-Promptify is a prompt submission and status-tracking system:
-
-- Users create **sessions** (grouped conversations) and send prompts within them
-- A separate **worker** processes prompts via a mock LLM
-- Status updates flow back via **SignalR** (`/hubs/prompts`)
-- One in-flight prompt per session (API enforces idle gate)
-
-# Intended stack
+# Stack
 
 - **Framework:** Next.js App Router, TypeScript
 - **Styling:** Tailwind v4 + shadcn (`base-nova`)
@@ -44,9 +33,7 @@ When a task spans backend and frontend:
 
 If backend endpoints or DTOs change, stop and regenerate before continuing frontend work.
 
-# API spec generation setup
-
-When scaffolding `frontend/`, add these files (adapted from wassup-web):
+# API spec generation
 
 **`package.json` script:**
 

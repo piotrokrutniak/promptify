@@ -2,7 +2,7 @@
 
 Promptify backend: .NET 10 Clean Architecture, CQRS via MediatR, PostgreSQL, RabbitMQ + MassTransit, SignalR.
 
-Before substantial work, review `../docs/00-requirements.md` and `../docs/07-api-worker-integration.md`.
+Before substantial work, review `../docs/architecture.md`.
 
 ## Architecture
 
@@ -56,8 +56,6 @@ Run all tests: `make test` from repo root.
 - After changing endpoints or DTOs: build backend, then regenerate frontend clients (see `../frontend/AGENTS.md`)
 
 ## Session and prompt rules
-
-From `../docs/07-api-worker-integration.md`:
 
 - **Session init** (`POST /api/Sessions`) — creates session + first prompt (`OrderIndex = 0`, status `Pending`), publishes `ProcessPromptCommand`
 - **Follow-up prompt** (`POST /api/Sessions/{id}/prompts`) — session must be idle (no `Pending` or `Processing` prompts) → `409 Conflict` otherwise
