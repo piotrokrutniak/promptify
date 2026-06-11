@@ -25,12 +25,6 @@ export interface CreatePromptRequest {
      * @memberof CreatePromptRequest
      */
     input: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePromptRequest
-     */
-    data: string | null;
 }
 
 /**
@@ -38,7 +32,6 @@ export interface CreatePromptRequest {
  */
 export function instanceOfCreatePromptRequest(value: object): value is CreatePromptRequest {
     if (!('input' in value) || value['input'] === undefined) return false;
-    if (!('data' in value) || value['data'] === undefined) return false;
     return true;
 }
 
@@ -53,7 +46,6 @@ export function CreatePromptRequestFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'input': json['input'],
-        'data': json['data'],
     };
 }
 
@@ -69,7 +61,6 @@ export function CreatePromptRequestToJSONTyped(value?: CreatePromptRequest | nul
     return {
         
         'input': value['input'],
-        'data': value['data'],
     };
 }
 

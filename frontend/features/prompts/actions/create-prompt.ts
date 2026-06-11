@@ -26,7 +26,6 @@ export async function createPromptAction(
       sessionId: parsed.data.sessionId,
       createPromptRequest: {
         input: parsed.data.input,
-        data: null,
       },
     })
 

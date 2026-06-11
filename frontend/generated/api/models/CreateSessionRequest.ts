@@ -25,12 +25,6 @@ export interface CreateSessionRequest {
      * @memberof CreateSessionRequest
      */
     input: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateSessionRequest
-     */
-    data: string | null;
 }
 
 /**
@@ -38,7 +32,6 @@ export interface CreateSessionRequest {
  */
 export function instanceOfCreateSessionRequest(value: object): value is CreateSessionRequest {
     if (!('input' in value) || value['input'] === undefined) return false;
-    if (!('data' in value) || value['data'] === undefined) return false;
     return true;
 }
 
@@ -53,7 +46,6 @@ export function CreateSessionRequestFromJSONTyped(json: any, ignoreDiscriminator
     return {
         
         'input': json['input'],
-        'data': json['data'],
     };
 }
 
@@ -69,7 +61,6 @@ export function CreateSessionRequestToJSONTyped(value?: CreateSessionRequest | n
     return {
         
         'input': value['input'],
-        'data': value['data'],
     };
 }
 

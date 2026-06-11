@@ -10,6 +10,7 @@ export * from './InfoRequest';
 export * from './InfoResponse';
 export * from './LoginRequest';
 export * from './PromptDto';
+export * from './PromptStatus';
 export * from './RefreshRequest';
 export * from './RegisterRequest';
 export * from './ResendConfirmationEmailRequest';

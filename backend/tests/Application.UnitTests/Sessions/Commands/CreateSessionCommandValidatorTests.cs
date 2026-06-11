@@ -11,7 +11,7 @@ public class CreateSessionCommandValidatorTests
     [Test]
     public void ShouldRequireInput()
     {
-        var result = _validator.Validate(new CreateSessionCommand("", null));
+        var result = _validator.Validate(new CreateSessionCommand(""));
 
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateSessionCommand.Input));
@@ -20,7 +20,7 @@ public class CreateSessionCommandValidatorTests
     [Test]
     public void ShouldRejectInputExceedingMaxLength()
     {
-        var result = _validator.Validate(new CreateSessionCommand(new string('a', 8001), null));
+        var result = _validator.Validate(new CreateSessionCommand(new string('a', 8001)));
 
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.PropertyName == nameof(CreateSessionCommand.Input));
@@ -29,15 +29,7 @@ public class CreateSessionCommandValidatorTests
     [Test]
     public void ShouldAcceptMinimalValidCommand()
     {
-        var result = _validator.Validate(new CreateSessionCommand("Hello", null));
-
-        result.IsValid.ShouldBeTrue();
-    }
-
-    [Test]
-    public void ShouldAcceptFullValidCommand()
-    {
-        var result = _validator.Validate(new CreateSessionCommand("Hello", "{\"key\":\"value\"}"));
+        var result = _validator.Validate(new CreateSessionCommand("Hello"));
 
         result.IsValid.ShouldBeTrue();
     }

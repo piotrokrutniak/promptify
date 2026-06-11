@@ -16,7 +16,7 @@ public class CreateSessionTests : TestBase
         await TestApp.RunAsDefaultUserAsync();
 
         await Should.ThrowAsync<ValidationException>(
-            () => TestApp.SendAsync(new CreateSessionCommand("", null)));
+            () => TestApp.SendAsync(new CreateSessionCommand("")));
     }
 
     [Test]
@@ -24,7 +24,7 @@ public class CreateSessionTests : TestBase
     {
         await TestApp.RunAsDefaultUserAsync();
 
-        var response = await TestApp.SendAsync(new CreateSessionCommand("Hello", null));
+        var response = await TestApp.SendAsync(new CreateSessionCommand("Hello"));
 
         response.SessionId.ShouldBeGreaterThan(0);
         response.Title.ShouldBe("Hello");

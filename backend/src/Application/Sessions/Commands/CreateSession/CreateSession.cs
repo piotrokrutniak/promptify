@@ -11,7 +11,7 @@ using PromptifyWebApi.Shared.Messaging;
 namespace PromptifyWebApi.Application.Sessions.Commands.CreateSession;
 
 [Authorize]
-public record CreateSessionCommand(string Input, string? Data) : IRequest<CreateSessionResponse>;
+public record CreateSessionCommand(string Input) : IRequest<CreateSessionResponse>;
 
 public class CreateSessionCommandValidator : AbstractValidator<CreateSessionCommand>
 {
@@ -51,7 +51,6 @@ public class CreateSessionCommandHandler : IRequestHandler<CreateSessionCommand,
         {
             OrderIndex = 0,
             Input = request.Input,
-            Data = request.Data,
             Status = PromptStatus.Pending
         };
 

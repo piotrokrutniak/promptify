@@ -26,7 +26,7 @@ public class PromptFlowTests : TestBase
     {
         await TestApp.RunAsDefaultUserAsync();
 
-        var response = await TestApp.SendAsync(new CreateSessionCommand("functional test", null));
+        var response = await TestApp.SendAsync(new CreateSessionCommand("functional test"));
 
         await ConsumePromptAsync(response.Prompt.Id, response.SessionId);
 
@@ -41,10 +41,10 @@ public class PromptFlowTests : TestBase
     {
         await TestApp.RunAsDefaultUserAsync();
 
-        var session = await TestApp.SendAsync(new CreateSessionCommand("first prompt", null));
+        var session = await TestApp.SendAsync(new CreateSessionCommand("first prompt"));
         await ConsumePromptAsync(session.Prompt.Id, session.SessionId);
 
-        var followUp = await TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "second prompt", null));
+        var followUp = await TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "second prompt"));
         await ConsumePromptAsync(followUp.Id, session.SessionId);
 
         var first = await TestApp.FindAsync<Prompt>(session.Prompt.Id);
@@ -85,11 +85,11 @@ public class PromptFlowTests : TestBase
                 return $"Mock response to: {lastUserMessage}";
             });
 
-        var session = await TestApp.SendAsync(new CreateSessionCommand("first prompt", null));
+        var session = await TestApp.SendAsync(new CreateSessionCommand("first prompt"));
         await ConsumePromptAsync(session.Prompt.Id, session.SessionId, llmClient.Object);
 
         var followUp = await TestApp.SendAsync(
-            new CreatePromptCommand(session.SessionId, "second prompt", null));
+            new CreatePromptCommand(session.SessionId, "second prompt"));
         await ConsumePromptAsync(followUp.Id, session.SessionId, llmClient.Object);
 
         capturedOnSecond.ShouldNotBeNull();

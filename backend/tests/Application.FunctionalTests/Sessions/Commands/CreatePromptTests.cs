@@ -21,10 +21,10 @@ public class CreatePromptTests : TestBase
     {
         await TestApp.RunAsDefaultUserAsync();
 
-        var session = await TestApp.SendAsync(new CreateSessionCommand("first", null));
+        var session = await TestApp.SendAsync(new CreateSessionCommand("first"));
 
         await Should.ThrowAsync<ValidationException>(
-            () => TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "", null)));
+            () => TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "")));
     }
 
     [Test]
@@ -32,10 +32,10 @@ public class CreatePromptTests : TestBase
     {
         await TestApp.RunAsDefaultUserAsync();
 
-        var session = await TestApp.SendAsync(new CreateSessionCommand("first", null));
+        var session = await TestApp.SendAsync(new CreateSessionCommand("first"));
 
         await Should.ThrowAsync<ConflictException>(
-            () => TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "second", null)));
+            () => TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "second")));
     }
 
     [Test]
@@ -43,11 +43,11 @@ public class CreatePromptTests : TestBase
     {
         await TestApp.RunAsDefaultUserAsync();
 
-        var session = await TestApp.SendAsync(new CreateSessionCommand("first", null));
+        var session = await TestApp.SendAsync(new CreateSessionCommand("first"));
 
         await ConsumePromptAsync(session.Prompt.Id, session.SessionId);
 
-        var followUp = await TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "second", null));
+        var followUp = await TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "second"));
 
         followUp.OrderIndex.ShouldBe(1);
         followUp.Status.ShouldBe(PromptStatus.Pending);

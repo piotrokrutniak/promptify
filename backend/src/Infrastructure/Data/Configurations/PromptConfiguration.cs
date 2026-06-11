@@ -18,9 +18,6 @@ public class PromptConfiguration : IEntityTypeConfiguration<Prompt>
         builder.Property(p => p.ErrorMessage)
             .HasMaxLength(4000);
 
-        builder.Property(p => p.Data)
-            .HasColumnType("jsonb");
-
         builder.Property(p => p.Status)
             .HasConversion<string>()
             .HasMaxLength(20);

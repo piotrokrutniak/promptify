@@ -11,7 +11,7 @@ public class CreatePromptCommandValidatorTests
     [Test]
     public void ShouldRequirePositiveSessionId()
     {
-        var result = _validator.Validate(new CreatePromptCommand(0, "Hello", null));
+        var result = _validator.Validate(new CreatePromptCommand(0, "Hello"));
 
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.PropertyName == nameof(CreatePromptCommand.SessionId));
@@ -20,7 +20,7 @@ public class CreatePromptCommandValidatorTests
     [Test]
     public void ShouldRequireInput()
     {
-        var result = _validator.Validate(new CreatePromptCommand(1, "", null));
+        var result = _validator.Validate(new CreatePromptCommand(1, ""));
 
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.PropertyName == nameof(CreatePromptCommand.Input));
@@ -29,7 +29,7 @@ public class CreatePromptCommandValidatorTests
     [Test]
     public void ShouldRejectInputExceedingMaxLength()
     {
-        var result = _validator.Validate(new CreatePromptCommand(1, new string('a', 8001), null));
+        var result = _validator.Validate(new CreatePromptCommand(1, new string('a', 8001)));
 
         result.IsValid.ShouldBeFalse();
         result.Errors.ShouldContain(e => e.PropertyName == nameof(CreatePromptCommand.Input));
@@ -38,7 +38,7 @@ public class CreatePromptCommandValidatorTests
     [Test]
     public void ShouldAcceptValidCommand()
     {
-        var result = _validator.Validate(new CreatePromptCommand(1, "Hello", null));
+        var result = _validator.Validate(new CreatePromptCommand(1, "Hello"));
 
         result.IsValid.ShouldBeTrue();
     }

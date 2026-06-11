@@ -49,7 +49,7 @@ public class CreatePromptTests
         var handler = new CreatePromptCommandHandler(context, user.Object, publishEndpoint.Object);
 
         var result = await handler.Handle(
-            new CreatePromptCommand(session.Id, "second", null),
+            new CreatePromptCommand(session.Id, "second"),
             CancellationToken.None);
 
         result.Id.ShouldBeGreaterThan(0);
@@ -89,7 +89,7 @@ public class CreatePromptTests
             Mock.Of<IPublishEndpoint>());
 
         var act = () => handler.Handle(
-            new CreatePromptCommand(session.Id, "second", null),
+            new CreatePromptCommand(session.Id, "second"),
             CancellationToken.None);
 
         await act.ShouldThrowAsync<ForbiddenAccessException>();
@@ -113,7 +113,7 @@ public class CreatePromptTests
             Mock.Of<IPublishEndpoint>());
 
         var act = () => handler.Handle(
-            new CreatePromptCommand(999, "second", null),
+            new CreatePromptCommand(999, "second"),
             CancellationToken.None);
 
         await act.ShouldThrowAsync<EntityNotFoundException>();
@@ -146,7 +146,7 @@ public class CreatePromptTests
         var handler = new CreatePromptCommandHandler(context, user.Object, publishEndpoint.Object);
 
         var act = () => handler.Handle(
-            new CreatePromptCommand(session.Id, "second", null),
+            new CreatePromptCommand(session.Id, "second"),
             CancellationToken.None);
 
         await act.ShouldThrowAsync<ConflictException>();

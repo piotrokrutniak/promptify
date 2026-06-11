@@ -36,7 +36,7 @@ public class CreateSessionTests
         var handler = new CreateSessionCommandHandler(context, user.Object, publishEndpoint.Object);
 
         var result = await handler.Handle(
-            new CreateSessionCommand("Hello", null),
+            new CreateSessionCommand("Hello"),
             CancellationToken.None);
 
         result.SessionId.ShouldBeGreaterThan(0);

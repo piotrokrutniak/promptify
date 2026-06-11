@@ -50,7 +50,7 @@
           "Sessions"
         ],
         "summary": "Create session with first prompt",
-        "description": "Creates a new session for the authenticated user and enqueues the first prompt for worker processing. Request body: input (required, max 8000 chars), data (optional context). Session title is derived from the first non-empty line of input (max 200 chars). Returns 201 Created with sessionId, title, and the initial prompt in Pending status. Location header points to /api/Sessions/{sessionId}.",
+        "description": "Creates a new session for the authenticated user and enqueues the first prompt for worker processing. Request body: input (required, max 8000 chars). Session title is derived from the first non-empty line of input (max 200 chars). Returns 201 Created with sessionId, title, and the initial prompt in Pending status. Location header points to /api/Sessions/{sessionId}.",
         "operationId": "CreateSession",
         "requestBody": {
           "content": {
@@ -677,37 +677,23 @@
       },
       "CreatePromptRequest": {
         "required": [
-          "input",
-          "data"
+          "input"
         ],
         "type": "object",
         "properties": {
           "input": {
             "type": "string"
-          },
-          "data": {
-            "type": [
-              "null",
-              "string"
-            ]
           }
         }
       },
       "CreateSessionRequest": {
         "required": [
-          "input",
-          "data"
+          "input"
         ],
         "type": "object",
         "properties": {
           "input": {
             "type": "string"
-          },
-          "data": {
-            "type": [
-              "null",
-              "string"
-            ]
           }
         }
       },
@@ -862,7 +848,7 @@
             "format": "int32"
           },
           "status": {
-            "type": "string"
+            "$ref": "#/components/schemas/PromptStatus"
           },
           "input": {
             "type": "string"
@@ -884,6 +870,15 @@
             "format": "date-time"
           }
         }
+      },
+      "PromptStatus": {
+        "enum": [
+          "Pending",
+          "Processing",
+          "Completed",
+          "Failed",
+          "Cancelled"
+        ]
       },
       "RefreshRequest": {
         "required": [

@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { PromptStatus } from './PromptStatus';
+import {
+    PromptStatusFromJSON,
+    PromptStatusFromJSONTyped,
+    PromptStatusToJSON,
+    PromptStatusToJSONTyped,
+} from './PromptStatus';
+
 /**
  * 
  * @export
@@ -33,10 +41,10 @@ export interface PromptDto {
     orderIndex?: number;
     /**
      * 
-     * @type {string}
+     * @type {PromptStatus}
      * @memberof PromptDto
      */
-    status?: string;
+    status?: PromptStatus;
     /**
      * 
      * @type {string}
@@ -63,6 +71,8 @@ export interface PromptDto {
     created?: Date;
 }
 
+
+
 /**
  * Check if a given object implements the PromptDto interface.
  */
@@ -82,7 +92,7 @@ export function PromptDtoFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         
         'id': json['id'] == null ? undefined : json['id'],
         'orderIndex': json['orderIndex'] == null ? undefined : json['orderIndex'],
-        'status': json['status'] == null ? undefined : json['status'],
+        'status': json['status'] == null ? undefined : PromptStatusFromJSON(json['status']),
         'input': json['input'] == null ? undefined : json['input'],
         'output': json['output'] == null ? undefined : json['output'],
         'errorMessage': json['errorMessage'] == null ? undefined : json['errorMessage'],
@@ -103,7 +113,7 @@ export function PromptDtoToJSONTyped(value?: PromptDto | null, ignoreDiscriminat
         
         'id': value['id'],
         'orderIndex': value['orderIndex'],
-        'status': value['status'],
+        'status': PromptStatusToJSON(value['status']),
         'input': value['input'],
         'output': value['output'],
         'errorMessage': value['errorMessage'],

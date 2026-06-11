@@ -1,11 +1,12 @@
 import type { PromptDto } from "@/generated/api"
+import type { PromptStatus } from "@/generated/api/models/PromptStatus"
 import { upsertPrompt } from "@/lib/prompts/upsert-prompt"
 
 export type PromptStatusChangedMessage = {
   promptId: number
   sessionId: number
   orderIndex: number
-  status: string
+  status: PromptStatus
   input: string
   output: string | null
   errorMessage: string | null

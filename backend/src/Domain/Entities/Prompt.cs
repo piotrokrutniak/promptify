@@ -14,8 +14,6 @@ public class Prompt : BaseAuditableEntity
 
     public PromptStatus Status { get; set; } = PromptStatus.Pending;
 
-    public string? Data { get; set; }
-
     public DateTimeOffset? ProcessingStartedAt { get; set; }
 
     public DateTimeOffset? CompletedAt { get; set; }
