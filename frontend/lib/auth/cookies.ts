@@ -5,7 +5,7 @@ import {
   ACCESS_TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
 } from "@/lib/auth/constants"
-import { useSecureCookies } from "@/lib/auth/secure-cookies"
+import { shouldUseSecureCookies } from "@/lib/auth/secure-cookies"
 
 export { ACCESS_TOKEN_COOKIE, REFRESH_TOKEN_COOKIE }
 
@@ -15,7 +15,7 @@ function cookieOptions(maxAge: number) {
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: useSecureCookies(),
+    secure: shouldUseSecureCookies(),
     path: "/",
     maxAge,
   }

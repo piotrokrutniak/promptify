@@ -1,7 +1,7 @@
 "use client"
 
 import { SquareIcon } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -31,24 +31,28 @@ export function ChatComposer({
   draftKey,
   restoreDraft,
 }: ChatComposerProps) {
-  const [input, setInput] = useState("")
+  const [input, setInput] = useState(() =>
+    draftKey ? readChatDraft(draftKey) : ""
+  )
+  const [prevDraftKey, setPrevDraftKey] = useState(draftKey)
+  const [prevRestoreAt, setPrevRestoreAt] = useState<number | undefined>(
+    undefined
+  )
 
-  useEffect(() => {
-    if (!draftKey) {
-      return
-    }
+  if (draftKey !== prevDraftKey) {
+    setPrevDraftKey(draftKey)
+    setInput(draftKey ? readChatDraft(draftKey) : "")
+  }
 
-    setInput(readChatDraft(draftKey))
-  }, [draftKey])
-
-  useEffect(() => {
-    if (!restoreDraft || !draftKey) {
-      return
-    }
-
+  if (
+    restoreDraft &&
+    draftKey &&
+    restoreDraft.at !== prevRestoreAt
+  ) {
+    setPrevRestoreAt(restoreDraft.at)
     setInput(restoreDraft.text)
     writeChatDraft(draftKey, restoreDraft.text)
-  }, [draftKey, restoreDraft?.at, restoreDraft?.text])
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()

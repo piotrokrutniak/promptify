@@ -7,17 +7,24 @@ import { useEffect, useState } from "react"
  * Hides immediately when `shouldOpen` becomes false.
  */
 export function useDeferredOpen(shouldOpen: boolean, delayMs: number): boolean {
-  const [open, setOpen] = useState(false)
+  const [delayedOpen, setDelayedOpen] = useState(false)
+  const [prevShouldOpen, setPrevShouldOpen] = useState(shouldOpen)
+
+  if (shouldOpen !== prevShouldOpen) {
+    setPrevShouldOpen(shouldOpen)
+    if (!shouldOpen) {
+      setDelayedOpen(false)
+    }
+  }
 
   useEffect(() => {
     if (!shouldOpen) {
-      setOpen(false)
       return
     }
 
-    const timer = window.setTimeout(() => setOpen(true), delayMs)
+    const timer = window.setTimeout(() => setDelayedOpen(true), delayMs)
     return () => window.clearTimeout(timer)
   }, [shouldOpen, delayMs])
 
-  return open
+  return shouldOpen && delayedOpen
 }

@@ -9,7 +9,7 @@ import {
   ACCESS_TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
 } from "@/lib/auth/constants"
-import { useSecureCookies } from "@/lib/auth/secure-cookies"
+import { shouldUseSecureCookies } from "@/lib/auth/secure-cookies"
 
 const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 14 // 14 days
 
@@ -17,7 +17,7 @@ function authCookieOptions(maxAge: number) {
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: useSecureCookies(),
+    secure: shouldUseSecureCookies(),
     path: "/",
     maxAge,
   }
