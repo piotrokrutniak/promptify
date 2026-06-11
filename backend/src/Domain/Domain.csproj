@@ -5,8 +5,4 @@
     <AssemblyName>PromptifyWebApi.Domain</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MediatR.Contracts" />
-  </ItemGroup>
-
 </Project>

@@ -8,7 +8,7 @@ Before substantial work, review `../docs/architecture.md`.
 
 | Layer | Path | Responsibility |
 |-------|------|----------------|
-| Domain | `src/Domain/` | Entities, enums, domain events |
+| Domain | `src/Domain/` | Entities, enums |
 | Application | `src/Application/` | Commands, queries, validators, handlers, DTOs |
 | Infrastructure | `src/Infrastructure/` | EF Core, Identity, messaging, LLM client |
 | Web | `src/Web/` | HTTP endpoints, SignalR hub, OpenAPI |
