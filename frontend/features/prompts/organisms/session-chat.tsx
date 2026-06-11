@@ -17,6 +17,7 @@ import {
   getInFlightPromptId,
   isSessionIdle,
 } from "@/lib/prompts/session-idle"
+import { upsertPrompt } from "@/lib/prompts/upsert-prompt"
 import { applyPromptStatusChanged } from "@/lib/signalr/prompt-status-changed"
 import { parseSessionId } from "@/lib/sessions/parse-id"
 
@@ -94,7 +95,7 @@ export function SessionChat(props: SessionChatProps) {
         return
       }
 
-      setPrompts((current) => [...current, result.prompt])
+      setPrompts((current) => upsertPrompt(current, result.prompt))
     })
   }
 

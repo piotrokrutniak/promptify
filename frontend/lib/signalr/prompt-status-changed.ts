@@ -1,5 +1,5 @@
 import type { PromptDto } from "@/generated/api"
-import { parseSessionId } from "@/lib/sessions/parse-id"
+import { upsertPrompt } from "@/lib/prompts/upsert-prompt"
 
 export type PromptStatusChangedMessage = {
   promptId: number
@@ -15,32 +15,14 @@ export function applyPromptStatusChanged(
   prompts: PromptDto[],
   message: PromptStatusChangedMessage
 ): PromptDto[] {
-  const index = prompts.findIndex(
-    (prompt) => parseSessionId(prompt.id) === message.promptId
-  )
-
-  if (index === -1) {
-    return [
-      ...prompts,
-      {
-        id: message.promptId,
-        orderIndex: message.orderIndex,
-        status: message.status,
-        input: message.input,
-        output: message.output ?? undefined,
-        errorMessage: message.errorMessage ?? undefined,
-      },
-    ]
+  const prompt: PromptDto = {
+    id: message.promptId,
+    orderIndex: message.orderIndex,
+    status: message.status,
+    input: message.input,
+    output: message.output ?? undefined,
+    errorMessage: message.errorMessage ?? undefined,
   }
 
-  return prompts.map((prompt, i) =>
-    i === index
-      ? {
-          ...prompt,
-          status: message.status,
-          output: message.output ?? undefined,
-          errorMessage: message.errorMessage ?? undefined,
-        }
-      : prompt
-  )
+  return upsertPrompt(prompts, prompt)
 }
