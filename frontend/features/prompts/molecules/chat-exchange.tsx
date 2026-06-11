@@ -1,4 +1,5 @@
 import type { PromptDto } from "@/generated/api"
+import { MarkdownContent } from "@/features/prompts/atoms/markdown-content"
 import { OutputBubble } from "@/features/prompts/atoms/output-bubble"
 import { PromptBubble } from "@/features/prompts/atoms/prompt-bubble"
 import { TypingIndicator } from "@/features/prompts/atoms/typing-indicator"
@@ -28,7 +29,7 @@ export function ChatExchange({ prompt }: ChatExchangeProps) {
         <OutputBubble>
           {showTyping ? <TypingIndicator /> : null}
           {prompt.output ? (
-            <p className="whitespace-pre-wrap">{prompt.output}</p>
+            <MarkdownContent content={prompt.output} />
           ) : null}
           {prompt.errorMessage ? (
             <p className="text-destructive">{prompt.errorMessage}</p>
