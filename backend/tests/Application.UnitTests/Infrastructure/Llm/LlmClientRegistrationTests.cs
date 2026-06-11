@@ -36,7 +36,10 @@ public class LlmClientRegistrationTests
     [Test]
     public async Task AddLlmClient_WhenOpenAiProviderMissingApiKey_ShouldFailValidationOnStartup()
     {
-        var builder = Host.CreateApplicationBuilder();
+        var builder = Host.CreateApplicationBuilder(new HostApplicationBuilderSettings
+        {
+            DisableDefaults = true,
+        });
 
         builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
         {
