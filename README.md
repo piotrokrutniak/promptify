@@ -2,7 +2,7 @@
 
 Interview assignment: submit prompts, track processing status, view results.
 
-**Stack:** .NET 10 Clean Architecture backend, PostgreSQL, RabbitMQ + MassTransit, separate Worker process, SignalR.
+**Stack:** .NET 10 backend, Next.js frontend, PostgreSQL, RabbitMQ + MassTransit, separate Worker process, SignalR.
 
 ## Quick start (local dev)
 
@@ -23,7 +23,12 @@ Requires Docker only.
 make docker-up
 ```
 
-API at `http://localhost:8080/scalar`.
+- UI at `http://localhost:3000`
+- API docs at `http://localhost:8080/scalar`
+
+Sign in with the seeded account: `administrator@localhost.com` / `Administrator1!`
+
+Mock LLM is enabled by default — no API keys required.
 
 ## LLM provider (Worker)
 

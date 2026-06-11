@@ -22,6 +22,17 @@ User (Next.js) ──REST──► Web API ──► PostgreSQL (prompts + statu
 | **PostgreSQL** | Source of truth for sessions, prompts, status |
 | **RabbitMQ** | Dispatch (`ProcessPromptCommand`) + status events (`PromptStatusChanged`) |
 
+## Orchestration
+
+`make docker-up` runs the full stack in Docker: PostgreSQL, RabbitMQ, Web API, Worker, and Next.js frontend.
+
+| Service | URL |
+|---------|-----|
+| Frontend | `http://localhost:3000` |
+| Web API (Scalar) | `http://localhost:8080/scalar` |
+
+The frontend container uses two API URLs: `API_BASE_URL=http://webapi:8080` for server-side calls, and `PUBLIC_API_BASE_URL=http://localhost:8080` for browser SignalR. Local dev with Aspire uses `make apphost` plus `cd frontend && npm run dev`.
+
 ## Request flow
 
 1. Client `POST` prompt → API inserts `Pending` in DB, publishes `ProcessPromptCommand` to RabbitMQ.
