@@ -1,7 +1,7 @@
 "use server"
 
-import { ResponseError } from "@/generated/api"
 import { createAuthenticatedSessionsApi } from "@/lib/api-client"
+import { ActionError, runServerAction } from "@/lib/run-server-action"
 import {
   createSessionSchema,
   type CreateSessionActionResult,
@@ -11,36 +11,26 @@ import {
 export async function createSessionAction(
   input: CreateSessionValues
 ): Promise<CreateSessionActionResult> {
-  const parsed = createSessionSchema.safeParse(input)
-  if (!parsed.success) {
-    return {
-      ok: false,
-      error: parsed.error.issues[0]?.message ?? "Invalid message",
-    }
-  }
+  return runServerAction({
+    schema: createSessionSchema,
+    input,
+    invalidFallback: "Invalid message",
+    fallbackError: "Unable to create session. Is the API running?",
+    statusErrors: { 400: "Invalid message" },
+    execute: async (data) => {
+      const response = await (
+        await createAuthenticatedSessionsApi()
+      ).createSession({
+        createSessionRequest: {
+          input: data.input,
+        },
+      })
 
-  try {
-    const response = await (
-      await createAuthenticatedSessionsApi()
-    ).createSession({
-      createSessionRequest: {
-        input: parsed.data.input,
-      },
-    })
-
-    const sessionId = response.sessionId
-    if (sessionId === undefined) {
-      return { ok: false, error: "Session created but no session id returned" }
-    }
-
-    return { ok: true, sessionId }
-  } catch (error) {
-    if (error instanceof ResponseError) {
-      if (error.response.status === 400) {
-        return { ok: false, error: "Invalid message" }
+      if (response.sessionId === undefined) {
+        throw new ActionError("Session created but no session id returned")
       }
-    }
 
-    return { ok: false, error: "Unable to create session. Is the API running?" }
-  }
+      return { sessionId: response.sessionId }
+    },
+  })
 }

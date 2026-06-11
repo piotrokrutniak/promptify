@@ -30,26 +30,16 @@ export function createUsersApi(accessToken?: string) {
   return new UsersApi(createConfiguration(accessToken))
 }
 
-export async function createAuthenticatedUsersApi() {
+type ApiConstructor<T> = new (configuration?: Configuration) => T
+
+async function createAuthenticatedApi<T>(ApiClass: ApiConstructor<T>): Promise<T> {
   const token = await getAccessToken()
   if (!token) {
     throw new Error("Not authenticated")
   }
-  return new UsersApi(createConfiguration(token))
+  return new ApiClass(createConfiguration(token))
 }
 
-export async function createAuthenticatedSessionsApi() {
-  const token = await getAccessToken()
-  if (!token) {
-    throw new Error("Not authenticated")
-  }
-  return new SessionsApi(createConfiguration(token))
-}
-
-export async function createAuthenticatedPromptsApi() {
-  const token = await getAccessToken()
-  if (!token) {
-    throw new Error("Not authenticated")
-  }
-  return new PromptsApi(createConfiguration(token))
-}
+export const createAuthenticatedUsersApi = () => createAuthenticatedApi(UsersApi)
+export const createAuthenticatedSessionsApi = () => createAuthenticatedApi(SessionsApi)
+export const createAuthenticatedPromptsApi = () => createAuthenticatedApi(PromptsApi)
