@@ -42,7 +42,7 @@ public class CreateSessionTests
         result.SessionId.ShouldBeGreaterThan(0);
         result.Title.ShouldBe("Hello");
         result.Prompt.Id.ShouldBeGreaterThan(0);
-        result.Prompt.Status.ShouldBe(nameof(PromptStatus.Pending));
+        result.Prompt.Status.ShouldBe(PromptStatus.Pending);
         result.Prompt.Input.ShouldBe("Hello");
 
         var prompts = await context.Prompts.AsNoTracking().ToListAsync();

@@ -1,3 +1,5 @@
+using PromptifyWebApi.Domain.Enums;
+
 namespace PromptifyWebApi.Application.Common.Models;
 
 public class PromptDto
@@ -6,7 +8,7 @@ public class PromptDto
 
     public int OrderIndex { get; init; }
 
-    public string Status { get; init; } = null!;
+    public PromptStatus Status { get; init; }
 
     public string Input { get; init; } = null!;
 

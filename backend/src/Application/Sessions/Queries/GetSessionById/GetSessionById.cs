@@ -1,4 +1,5 @@
 using PromptifyWebApi.Application.Common.Interfaces;
+using PromptifyWebApi.Application.Common.Mappings;
 using PromptifyWebApi.Application.Sessions;
 using PromptifyWebApi.Application.Common.Models;
 using PromptifyWebApi.Application.Common.Security;
@@ -29,16 +30,7 @@ public class GetSessionByIdQueryHandler : IRequestHandler<GetSessionByIdQuery, S
             .AsNoTracking()
             .Where(p => p.SessionId == session.Id && p.Status != PromptStatus.Cancelled)
             .OrderBy(p => p.OrderIndex)
-            .Select(p => new PromptDto
-            {
-                Id = p.Id,
-                OrderIndex = p.OrderIndex,
-                Status = p.Status.ToString(),
-                Input = p.Input,
-                Output = p.Output,
-                ErrorMessage = p.ErrorMessage,
-                Created = p.Created
-            })
+            .Select(PromptMappings.ToDtoExpression)
             .ToListAsync(cancellationToken);
 
         return new SessionDto

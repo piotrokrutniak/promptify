@@ -29,6 +29,29 @@ internal static class SessionAccess
         return session;
     }
 
+    public static async Task<Prompt> GetOwnedPromptAsync(
+        IApplicationDbContext context,
+        IUser user,
+        int promptId,
+        CancellationToken cancellationToken)
+    {
+        var prompt = await context.Prompts
+            .Include(p => p.Session)
+            .FirstOrDefaultAsync(p => p.Id == promptId, cancellationToken);
+
+        if (prompt is null)
+        {
+            throw new EntityNotFoundException(nameof(Prompt), promptId);
+        }
+
+        if (prompt.Session.UserId != user.Id)
+        {
+            throw new ForbiddenAccessException();
+        }
+
+        return prompt;
+    }
+
     public static async Task EnsureSessionIdleAsync(
         IApplicationDbContext context,
         int sessionId,

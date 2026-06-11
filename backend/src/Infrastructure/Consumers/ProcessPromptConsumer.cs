@@ -1,5 +1,6 @@
 using MassTransit;
 using PromptifyWebApi.Application.Common.Interfaces;
+using PromptifyWebApi.Application.Common.Mappings;
 using PromptifyWebApi.Domain.Enums;
 using PromptifyWebApi.Infrastructure.Data;
 using PromptifyWebApi.Infrastructure.Llm;
@@ -126,15 +127,6 @@ public class ProcessPromptConsumer : IConsumer<ProcessPromptCommand>
 
     private Task PublishStatusAsync(Domain.Entities.Prompt prompt, CancellationToken cancellationToken)
     {
-        return _publishEndpoint.Publish(
-            new PromptStatusChanged(
-                prompt.Id,
-                prompt.SessionId,
-                prompt.OrderIndex,
-                prompt.Status.ToString(),
-                prompt.Input,
-                prompt.Output,
-                prompt.ErrorMessage),
-            cancellationToken);
+        return _publishEndpoint.Publish(prompt.ToStatusChanged(), cancellationToken);
     }
 }

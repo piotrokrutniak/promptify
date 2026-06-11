@@ -3,6 +3,7 @@ using PromptifyWebApi.Infrastructure.Messaging;
 using PromptifyWebApi.Web.Consumers;
 using PromptifyWebApi.Web.Hubs;
 using Scalar.AspNetCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,9 @@ if (!builder.Configuration.GetValue<bool>("FunctionalTesting:DisableMessaging"))
     builder.AddPromptifyMessaging(x => x.AddConsumer<PromptStatusChangedConsumer>());
 }
 
-builder.Services.AddSignalR();
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options =>
+        options.PayloadSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 var app = builder.Build();
 

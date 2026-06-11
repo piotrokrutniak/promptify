@@ -1,5 +1,6 @@
 using MassTransit;
 using PromptifyWebApi.Application.Common.Interfaces;
+using PromptifyWebApi.Application.Common.Mappings;
 using PromptifyWebApi.Application.Sessions;
 using PromptifyWebApi.Application.Common.Models;
 using PromptifyWebApi.Application.Common.Security;
@@ -63,15 +64,6 @@ public class CreatePromptCommandHandler : IRequestHandler<CreatePromptCommand, P
             new ProcessPromptCommand(prompt.Id, request.SessionId),
             cancellationToken);
 
-        return new PromptDto
-        {
-            Id = prompt.Id,
-            OrderIndex = prompt.OrderIndex,
-            Status = prompt.Status.ToString(),
-            Input = prompt.Input,
-            Output = prompt.Output,
-            ErrorMessage = prompt.ErrorMessage,
-            Created = prompt.Created
-        };
+        return prompt.ToDto();
     }
 }

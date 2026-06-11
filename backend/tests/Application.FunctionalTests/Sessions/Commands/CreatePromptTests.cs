@@ -50,7 +50,7 @@ public class CreatePromptTests : TestBase
         var followUp = await TestApp.SendAsync(new CreatePromptCommand(session.SessionId, "second", null));
 
         followUp.OrderIndex.ShouldBe(1);
-        followUp.Status.ShouldBe(nameof(PromptStatus.Pending));
+        followUp.Status.ShouldBe(PromptStatus.Pending);
         followUp.Input.ShouldBe("second");
 
         var prompt = await TestApp.FindAsync<Prompt>(followUp.Id);

@@ -54,7 +54,7 @@ public class CreatePromptTests
 
         result.Id.ShouldBeGreaterThan(0);
         result.OrderIndex.ShouldBe(1);
-        result.Status.ShouldBe(nameof(PromptStatus.Pending));
+        result.Status.ShouldBe(PromptStatus.Pending);
         result.Input.ShouldBe("second");
 
         var prompts = await context.Prompts.AsNoTracking().ToListAsync();

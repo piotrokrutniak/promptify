@@ -28,7 +28,7 @@ public class CreateSessionTests : TestBase
 
         response.SessionId.ShouldBeGreaterThan(0);
         response.Title.ShouldBe("Hello");
-        response.Prompt.Status.ShouldBe(nameof(PromptStatus.Pending));
+        response.Prompt.Status.ShouldBe(PromptStatus.Pending);
         response.Prompt.Input.ShouldBe("Hello");
         response.Prompt.OrderIndex.ShouldBe(0);
 

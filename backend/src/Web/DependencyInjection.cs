@@ -28,6 +28,7 @@ public static class DependencyInjection
         builder.Services.ConfigureHttpJsonOptions(options =>
         {
             options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
         builder.Services.AddOpenApi(options =>

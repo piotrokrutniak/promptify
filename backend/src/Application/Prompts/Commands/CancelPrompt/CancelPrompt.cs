@@ -1,10 +1,10 @@
 using MassTransit;
 using PromptifyWebApi.Application.Common.Exceptions;
 using PromptifyWebApi.Application.Common.Interfaces;
+using PromptifyWebApi.Application.Common.Mappings;
 using PromptifyWebApi.Application.Common.Security;
-using PromptifyWebApi.Domain.Entities;
+using PromptifyWebApi.Application.Sessions;
 using PromptifyWebApi.Domain.Enums;
-using PromptifyWebApi.Shared.Messaging;
 
 namespace PromptifyWebApi.Application.Prompts.Commands.CancelPrompt;
 
@@ -29,19 +29,8 @@ public class CancelPromptCommandHandler : IRequestHandler<CancelPromptCommand>
 
     public async Task Handle(CancelPromptCommand request, CancellationToken cancellationToken)
     {
-        var prompt = await _context.Prompts
-            .Include(p => p.Session)
-            .FirstOrDefaultAsync(p => p.Id == request.PromptId, cancellationToken);
-
-        if (prompt is null)
-        {
-            throw new EntityNotFoundException(nameof(Prompt), request.PromptId);
-        }
-
-        if (prompt.Session.UserId != _user.Id)
-        {
-            throw new ForbiddenAccessException();
-        }
+        var prompt = await SessionAccess.GetOwnedPromptAsync(
+            _context, _user, request.PromptId, cancellationToken);
 
         if (prompt.Status is not (PromptStatus.Pending or PromptStatus.Processing))
         {
@@ -51,15 +40,6 @@ public class CancelPromptCommandHandler : IRequestHandler<CancelPromptCommand>
         prompt.Status = PromptStatus.Cancelled;
         await _context.SaveChangesAsync(cancellationToken);
 
-        await _publishEndpoint.Publish(
-            new PromptStatusChanged(
-                prompt.Id,
-                prompt.SessionId,
-                prompt.OrderIndex,
-                prompt.Status.ToString(),
-                prompt.Input,
-                prompt.Output,
-                prompt.ErrorMessage),
-            cancellationToken);
+        await _publishEndpoint.Publish(prompt.ToStatusChanged(), cancellationToken);
     }
 }

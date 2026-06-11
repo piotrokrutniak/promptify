@@ -1,4 +1,5 @@
 using MassTransit;
+using PromptifyWebApi.Application.Common.Exceptions;
 using PromptifyWebApi.Application.Common.Interfaces;
 using PromptifyWebApi.Application.Prompts.Commands.CancelPrompt;
 using PromptifyWebApi.Domain.Entities;
@@ -98,5 +99,38 @@ public class CancelPromptTests
         published.ShouldNotBeNull();
         published!.PromptId.ShouldBe(prompt.Id);
         published.Status.ShouldBe(nameof(PromptStatus.Cancelled));
+    }
+
+    [Test]
+    public async Task Handle_WhenUserDoesNotOwnSession_ShouldThrowForbiddenAccessException()
+    {
+        var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .Options;
+
+        await using var context = new ApplicationDbContext(options);
+
+        var session = new Session { UserId = Guid.NewGuid().ToString() };
+        var prompt = new Prompt
+        {
+            OrderIndex = 0,
+            Input = "not mine",
+            Status = PromptStatus.Pending
+        };
+        session.Prompts.Add(prompt);
+        context.Sessions.Add(session);
+        await context.SaveChangesAsync(CancellationToken.None);
+
+        var user = new Mock<IUser>();
+        user.Setup(u => u.Id).Returns(Guid.NewGuid().ToString());
+
+        var handler = new CancelPromptCommandHandler(
+            context,
+            user.Object,
+            Mock.Of<IPublishEndpoint>());
+
+        var act = () => handler.Handle(new CancelPromptCommand(prompt.Id), CancellationToken.None);
+
+        await act.ShouldThrowAsync<ForbiddenAccessException>();
     }
 }
