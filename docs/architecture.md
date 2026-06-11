@@ -33,6 +33,8 @@ User (Next.js) ──REST──► Web API ──► PostgreSQL (prompts + statu
 
 The frontend container uses two API URLs: `API_BASE_URL=http://webapi:8080` for server-side calls, and `PUBLIC_API_BASE_URL=http://localhost:8080` for browser SignalR. Local dev with Aspire uses `make apphost` plus `cd frontend && npm run dev`.
 
+**Note:** The Next.js frontend is included in `docker-compose` so reviewers can run the full stack with one command. In a typical production setup, the frontend would be deployed separately (e.g. to Vercel) and configured via `API_BASE_URL` / `PUBLIC_API_BASE_URL` pointing at the hosted API — no Vercel-specific code is required in this repo.
+
 ## Request flow
 
 1. Client `POST` prompt → API inserts `Pending` in DB, publishes `ProcessPromptCommand` to RabbitMQ.

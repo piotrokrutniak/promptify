@@ -30,6 +30,8 @@ Sign in with the seeded account: `administrator@localhost.com` / `Administrator1
 
 Mock LLM is enabled by default — no API keys required.
 
+The frontend runs in Docker here for convenience; in production it would usually be deployed to Vercel (or similar) instead.
+
 ## LLM provider (Worker)
 
 Default is `Mock` (no external calls). To use a real model, set `Llm:Provider` on the **Worker** process:
